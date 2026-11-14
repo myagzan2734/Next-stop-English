@@ -423,6 +423,29 @@ body.insession .wrap{padding-bottom:0}
 .sesdone .kpis{text-align:left}
 .sdic{font-size:3rem}
 @media(max-width:480px){.thero{align-items:flex-start}.ring{width:88px;height:88px}.pmin{display:none}}
+
+.gl{font:inherit;color:inherit;background:none;border:0;border-bottom:2px dotted var(--lc);padding:0;cursor:help}
+.glpop{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 96px);z-index:30;max-width:min(92vw,460px);text-align:left;font:inherit;background:var(--ink);color:var(--paper);border:0;border-radius:14px;padding:12px 16px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.tkr{font-family:var(--mono);font-size:.85rem;color:var(--lc);margin-top:-6px}
+.mir{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:12px;margin:12px 0}
+.mirlab{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px}
+.mirrow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 2px}
+.mseg{font-family:var(--head);font-weight:700;font-size:1.12rem;padding:4px 7px;border-radius:7px;line-height:1.2}
+.mgap{width:9px}
+.mseg.c1{background:var(--k1s);color:var(--k1)}.mseg.c2{background:var(--k2s);color:var(--k2)}.mseg.c3{background:var(--k3s);color:var(--k3)}.mseg.c4{background:var(--k4s);color:var(--k4)}.mseg.c5{background:var(--k5s);color:var(--k5)}
+.mirarrow{font-family:var(--mono);font-size:.72rem;color:var(--muted);margin:8px 0}
+.brow{display:grid;grid-template-columns:auto 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.brow:first-of-type{border-top:0}
+.bsign{font-family:var(--mono);font-size:.74rem;font-weight:500;background:var(--ink);color:var(--paper);border-radius:8px;padding:4px 8px;align-self:start;min-width:2.4em;text-align:center}
+.bform{font-family:var(--mono);font-size:.88rem;color:var(--lc);margin-bottom:6px;line-height:1.5}
+.ben{font-weight:700;font-size:1.05rem}
+.ben .icon,.cmp .icon{width:30px;height:30px;font-size:.8rem;vertical-align:middle}
+.btr{color:var(--muted)}
+.why{margin-top:14px;padding:10px 12px;border-radius:12px;line-height:1.45}
+.why.ok{background:var(--teal-soft)}.why.bad{background:var(--coral-soft)}
+.trhint{font-weight:700;font-size:1.1rem;margin:0 0 6px}
+.sescard .err .m{font-size:.88rem}
+.sescard h4{color:var(--lc)}
 </style>
 </head>
 <body>
@@ -1740,7 +1763,7 @@ function dkey(d){d=d||new Date();return d.getFullYear()+"-"+String(d.getMonth()+
 function LS(id){const u=me();u.levels=u.levels||{};return u.levels[id]=Object.assign(blank(),u.levels[id]||{});}
 function migrate(u){
   u.levels=u.levels||{};if(u.data){u.levels.preint=u.data;delete u.data;if(!u.level)u.level="preint";}
-  u.srs=u.srs||{};u.days=u.days||{};u.xp=u.xp||0;u.fav=u.fav||[];u.log=u.log||[];u.goalXp=u.goalXp||60;
+  u.srs=u.srs||{};u.gl=u.gl||{};u.days=u.days||{};u.xp=u.xp||0;u.fav=u.fav||[];u.log=u.log||[];u.goalXp=u.goalXp||60;
   if(!u.v3){for(const[lid,L]of Object.entries(u.levels)){if(!L)continue;
       for(const k of Object.keys(L.learned||{})){const key=lid+":"+k;if(!u.srs[key])u.srs[key]={b:2,d:dkey()};}
       for(const[d,c]of Object.entries(L.days||{}))u.days[d]=(u.days[d]||0)+c*5;}
@@ -1813,13 +1836,312 @@ function readCards(S){const src=[];S.units.forEach(u=>{if(!isDlg(u.lis.text))src
   Object.values(S.exams).forEach(e=>e.secs.forEach(s=>{if(s.text)src.push({t:e.t+" okuma parçası",text:s.text,q:s.qs});}));
   const r=src[Math.floor(Math.random()*src.length)];return[{k:"read",t:r.t,text:r.text}].concat(r.q.map(x=>mcQ(x,"read")));}
 
+/* ===================== GRAMMAR LIBRARY ===================== */
+const GLOS={"özne":"Cümlede işi yapan kişi ya da şey. ‘Ali kitap okur’ cümlesinde özne Ali’dir. İngilizcede cümlenin en başında durur.","nesne":"İşten etkilenen kişi ya da şey. ‘Ali kitap okur’ cümlesinde nesne kitaptır. İngilizcede fiilden sonra gelir.","yardımcı fiil":"Asıl fiile yardım eden küçük kelime: do, does, did, am, is, are, have, will, can. Zamanı, olumsuzu ve soruyu o taşır.","yalın":"Fiilin hiçbir ek almamış hâli: go, work, eat. V1 de denir.","v1":"Fiilin yalın hâli: go, work, see.","v2":"Fiilin geçmiş zaman hâli: went, worked, saw.","v3":"Fiilin üçüncü hâli: gone, worked, seen. have ile ve edilgen yapıda kullanılır.","sıfat":"İsmi anlatan kelime: big, red, happy.","zarf":"Fiili anlatan kelime: slowly, well, always.","edat":"İsmin önüne gelip yer, zaman ya da yön bildiren küçük kelime: in, on, at, to, with.","çoğul":"Birden fazla: books, children.","tekil":"Tek bir tane: a book, a child."};
+const gl=s=>esc(s).replace(/(yardımcı fiil|özne|nesne|sıfat|zarf|edat|yalın|çoğul|tekil)(\p{L}*)|\b(V[123])\b/giu,(m,a,b,c)=>`<button class="gl" data-act="gl" data-v="${(a||c).toLocaleLowerCase("tr")}">${m}</button>`);
+const GL=[
+{id:"be",t:"be: am / is / are",tr:"‘-ım, -sın, -dır’ ekleri",lv:"A1",
+ sc:"Kim olduğunu, nereli olduğunu, mesleğini, nasıl hissettiğini söylerken kullanırsın. İngilizcede her cümlede bir fiil olmak zorundadır; başka fiil yoksa bu görevi be (am, is, are) üstlenir.",
+ tk:"Türkçedeki ‘-ım, -sın, -dır’ ekleri: öğrenci-y-im, yorgun-sun, doktor(dur).",
+ sm:"Türkçede ‘Ben öğrenciyim’ derken fiil yok, sadece -yim eki var. İngilizce bu eki ayrı bir kelime yapar: I am a student. Üç şekli var: I ile am; tek kişi ya da şeyle (he, she, it) is; you ve birden fazla kişiyle (we, they) are.",
+ m:[["öğrenci2 yim1","I1 am1 a_student2"],["yorgun3 değil2 sin1","You1 are1 not2 tired3"]],
+ b:[["+","I am / He, She, It is / You, We, They are","She is a doctor.","O bir doktor."],["−","am not / isn’t / aren’t","We aren’t late.","Biz geç kalmadık."],["?","Am / Is / Are + özne …?","Are you ready?","Hazır mısın?"]],
+ ex:[["I’m from Turkey.","Türkiyeliyim."],["He’s my brother.","O benim erkek kardeşim."],["It’s cold today.","Bugün hava soğuk."],["They’re at home.","Onlar evde."],["Is she a teacher?","O öğretmen mi?"]],
+ c:[["Hangisi doğru?",["We are students.","We is students.","We am students."],0,"We birden fazla kişi olduğu için are alır."],["‘O hasta değil.’ nasıl denir?",["He isn’t ill.","He not ill.","He doesn’t ill."],0,"be fiilinin olumsuzu not ile yapılır: is not = isn’t. do / does gerekmez."]],
+ err:[["I student.","I am a student.","İngilizcede fiilsiz cümle olmaz; am şart."],["She are happy.","She is happy.","Tek kişi (he, she, it) ile is kullanılır."],["Yes, I’m.","Yes, I am.","Olumlu kısa cevapta kısaltma yapılmaz."]],
+ f:[["My parents ___ teachers.","are","Annemle babam öğretmen."],["___ he from Spain?","Is","O İspanyalı mı?"],["I ___ not hungry.","am|’m","Aç değilim."]]},
+{id:"poss",t:"my, your, his, her; ’s",tr:"‘benim, senin, onun’; ‘-nin’ eki",lv:"A1",
+ sc:"Bir şeyin kime ait olduğunu söylersin: benim çantam, onun adı, Ali’nin arabası.",
+ tk:"Türkçede iki kez söylersin: ‘benim çanta-m’. İngilizcede baştaki kelime yeter: my bag. İsimlerde ‘-nin’ eki ’s olur: Ali’nin → Ali’s.",
+ sm:"my = benim, your = senin, his = onun (erkek), her = onun (kadın), its = onun (nesne ya da hayvan), our = bizim, their = onların. Bu kelimeler isimden hemen önce gelir ve hiç değişmez.",
+ m:[["çanta2 m1","my1 bag2"],["Ali1 ’nin2 / araba3 sı2","Ali1 ’s2 car3"]],
+ b:[["+","my / your / his / her / its / our / their + isim","This is our teacher.","Bu bizim öğretmenimiz."],["’s","kişi + ’s + isim","It’s Ece’s phone.","O, Ece’nin telefonu."],["?","Whose + isim …?","Whose bag is this?","Bu kimin çantası?"]],
+ ex:[["My name is Deniz.","Benim adım Deniz."],["Her brother is a doctor.","Onun erkek kardeşi doktor."],["His car is new.","Onun arabası yeni."],["Their house is big.","Onların evi büyük."],["This is my sister’s room.","Bu, kız kardeşimin odası."]],
+ c:[["‘Ayşe’nin adı’ yerine ‘onun adı’ nasıl denir?",["her name","his name","she name"],0,"Sahip kadınsa her, erkekse his. she ‘o’ demektir, ‘onun’ değil."],["Hangisi doğru?",["my friend’s car","my friend car’s","car my friend’s"],0,"’s sahibin sonuna gelir; sahip olunan şey ondan sonra söylenir."]],
+ err:[["She name is Elif.","Her name is Elif.","she = o; her = onun."],["This is the car of Ali.","This is Ali’s car.","Kişilerde ’s kullanılır."],["It’s they house.","It’s their house.","they = onlar; their = onların."]],
+ f:[["This is Tom. ___ wife is a nurse.","His","Bu Tom. Onun eşi hemşire."],["We love ___ city.","our","Şehrimizi seviyoruz."],["That is my ___ bike. (dad)","dad’s","O, babamın bisikleti."]]},
+{id:"this",t:"this, that, these, those",tr:"‘bu, şu, bunlar, şunlar’",lv:"A1",
+ sc:"Bir şeyi gösterirken kullanırsın. İki soruya bakarsın: yakın mı, uzak mı? Tek mi, çok mu?",
+ tk:"this = bu, that = şu ya da o, these = bunlar, those = şunlar ya da onlar.",
+ sm:"Elinle dokunabiliyorsan this (tek) ya da these (çok). Uzaktaysa that (tek) ya da those (çok). Tekil olanlarla is, çoğul olanlarla are kullanılır. these ve those’dan sonra gelen isim de çoğul olur.",
+ b:[["yakın","this + tekil / these + çoğul","These are my keys.","Bunlar benim anahtarlarım."],["uzak","that + tekil / those + çoğul","That is my school.","Şu benim okulum."],["?","Is this / that…? Are these / those…?","Are those your shoes?","Şunlar senin ayakkabıların mı?"]],
+ ex:[["This is my friend, Can.","Bu, arkadaşım Can."],["That car is very fast.","Şu araba çok hızlı."],["These apples are fresh.","Bu elmalar taze."],["Those people are tourists.","Şu insanlar turist."],["What is that?","Şu ne?"]],
+ c:[["Masanın üstündeki (yakın) üç kalem için hangisi?",["these pens","this pens","those pen"],0,"Yakın ve çoğul: these + çoğul isim."],["Hangisi doğru?",["That is my house.","That are my house.","Those is my house."],0,"that tekildir, is alır."]],
+ err:[["This are my books.","These are my books.","Çoğul isimle these kullanılır."],["Those is expensive.","Those are expensive.","those çoğuldur, are alır."],["these book","these books","these’den sonra isim çoğul olur."]],
+ f:[["___ is my phone. (yakın, tek)","This","Bu benim telefonum."],["Look at ___ birds over there! (uzak, çok)","those","Oradaki kuşlara bak!"],["Are ___ your glasses? (yakın, çok)","these","Bunlar senin gözlüğün mü?"]]},
+{id:"plur",t:"a / an ve çoğul -s",tr:"‘bir’ ve ‘-lar, -ler’",lv:"A1",
+ sc:"Bir şeyden kaç tane olduğunu söylersin. Tek ise önüne a ya da an gelir; birden fazlaysa sonuna -s eklenir.",
+ tk:"Türkçedeki ‘bir’ → a / an. ‘-lar, -ler’ → -s. Dikkat: Türkçede ‘üç kitap’ deriz; İngilizcede sayıdan sonra da çoğul gerekir: three books.",
+ sm:"a mı, an mı? Kelimenin ilk sesine bak: ünlü sesle başlıyorsa an (an apple, an hour), değilse a (a book, a university). Çoğulda çoğu kelime -s alır; -s, -sh, -ch, -x ile bitenler -es alır; ünsüz + y ile bitenlerde y gider, -ies gelir.",
+ m:[["kitap1 lar2","book1 -s2"]],
+ b:[["tekil","a + ünsüz ses / an + ünlü ses","a car, an egg","bir araba, bir yumurta"],["çoğul","isim + -s / -es / -ies","buses, cities","otobüsler, şehirler"],["düzensiz","ezberlenir","man → men, child → children, person → people","adam, çocuk, kişi"]],
+ ex:[["I have a dog and two cats.","Bir köpeğim ve iki kedim var."],["She’s an engineer.","O bir mühendis."],["These boxes are heavy.","Bu kutular ağır."],["There are three women in the room.","Odada üç kadın var."],["It’s an old film.","Eski bir film."]],
+ c:[["Hangisi doğru?",["two watches","two watchs","two watch"],0,"-ch ile biten isimlere -es eklenir; sayıdan sonra çoğul gerekir."],["___ umbrella",["an","a","the a"],0,"umbrella ünlü sesle başlar: an."]],
+ err:[["I have two brother.","I have two brothers.","Sayıdan sonra isim çoğul olur."],["She is teacher.","She is a teacher.","Mesleklerden önce a / an gelir."],["three childs","three children","child düzensizdir."]],
+ f:[["I’d like ___ orange.","an","Bir portakal istiyorum."],["There are five ___ in my class. (person)","people","Sınıfımda beş kişi var."],["He has two ___. (baby)","babies","İki bebeği var."]]},
+{id:"ps",t:"Present simple",tr:"Geniş zaman: ‘-ır, -ar’",lv:"A1",mz:"ps",
+ sc:"Her zaman, genelde ya da hiç yaptığın şeyleri ve değişmeyen gerçekleri anlatırsın: her sabah kahve içerim, İzmir’de yaşıyorum, su 100 derecede kaynar.",
+ tk:"Türkçedeki geniş zaman (-ır, -ar) ve alışkanlık anlatan ‘-iyor’: ‘Bankada çalışıyorum’ → I work in a bank.",
+ sm:"Fiili olduğu gibi söylersin: I work. Tek istisna: he, she, it ile fiile -s eklenir: She works. Olumsuz ve soru için yardımcı fiil do gerekir; he, she, it ile does olur. does gelince -s ona geçmiştir, fiil yalın kalır.",
+ m:[["çalış3 ır2 ım1","I1 (do)2 work3"],["O1 / çalış4 ma3 z2","She1 does2 not3 work4"]],
+ b:[["+","I / You / We / They + V1 — He / She / It + V1-s","He plays tennis.","O tenis oynar."],["−","don’t / doesn’t + V1","He doesn’t play tennis.","O tenis oynamaz."],["?","Do / Does + özne + V1?","Does he play tennis?","O tenis oynar mı?"]],
+ ex:[["I get up at seven.","Saat yedide kalkarım."],["She lives in Ankara.","O Ankara’da yaşıyor."],["We don’t eat meat.","Biz et yemeyiz."],["Do you speak English?","İngilizce konuşur musun?"],["What time does the film start?","Film saat kaçta başlıyor?"]],
+ c:[["My sister ___ in a hospital.",["works","work","working"],0,"My sister = she. He, she, it ile fiile -s eklenir."],["Hangisi doğru?",["Does he like coffee?","Does he likes coffee?","Do he like coffee?"],0,"does zaten -s’i taşır; fiil yalın kalır."]],
+ err:[["She work in a bank.","She works in a bank.","He, she, it ile -s unutulmaz."],["He doesn’t likes tea.","He doesn’t like tea.","doesn’t’tan sonra fiil yalın gelir."],["I am work here.","I work here.","Present simple’da am / is / are kullanılmaz."]],
+ vs:["Present simple mi, present continuous mu?","Her zaman","I drink tea every morning.","Şu an","I’m drinking tea now.","Alışkanlıksa simple, şu anda oluyorsa continuous."],
+ f:[["He ___ football on Sundays. (play)","plays","Pazarları futbol oynar."],["We ___ live in Istanbul. (olumsuz)","don’t|do not","İstanbul’da yaşamıyoruz."],["___ your mother work?","Does","Annen çalışıyor mu?"]]},
+{id:"freq",t:"always, usually, sometimes, never",tr:"Sıklık zarfları",lv:"A1",
+ sc:"Bir şeyi ne sıklıkla yaptığını söylersin: her zaman, genellikle, bazen, asla.",
+ tk:"always = her zaman, usually = genellikle, often = sık sık, sometimes = bazen, hardly ever = neredeyse hiç, never = asla.",
+ sm:"Yer kuralı basit: bu kelimeler fiilin hemen önüne gelir (I always walk). Tek istisna be fiilidir; am, is, are’dan sonra gelir (She is always happy). never zaten olumsuzdur; yanına not eklenmez.",
+ b:[["fiil","özne + sıklık + fiil","I usually walk to work.","İşe genellikle yürürüm."],["be","özne + be + sıklık","He is never late.","O asla geç kalmaz."],["?","How often…?","How often do you exercise?","Ne sıklıkla spor yaparsın?"]],
+ ex:[["I always have breakfast.","Her zaman kahvaltı yaparım."],["She sometimes works at home.","Bazen evde çalışır."],["We never watch TV.","Hiç televizyon izlemeyiz."],["They are often tired.","Onlar sık sık yorgun olur."],["I go to the gym twice a week.","Haftada iki kez spor salonuna giderim."]],
+ c:[["Hangisi doğru?",["She is always late.","She always is late.","Always she is late."],0,"be fiilinde sıklık zarfı am, is, are’dan sonra gelir."],["‘Asla et yemem.’ nasıl denir?",["I never eat meat.","I don’t never eat meat.","I eat never meat."],0,"never olumsuzluğu kendisi taşır; don’t eklenmez ve fiilden önce gelir."]],
+ err:[["I go always by bus.","I always go by bus.","Sıklık zarfı fiilden önce gelir."],["He never doesn’t call.","He never calls.","never ile ikinci bir olumsuz kullanılmaz."],["She usually is busy.","She is usually busy.","be’den sonra gelir."]],
+ f:[["I ___ drink coffee. I hate it. (asla)","never","Asla kahve içmem."],["She is ___ happy. (her zaman)","always","O her zaman mutlu."],["How ___ do you travel?","often","Ne sıklıkla seyahat edersin?"]]},
+{id:"can",t:"can / can’t",tr:"‘-ebil, -abil’ eki",lv:"A1",mz:"modal",
+ sc:"Yapabildiğin şeyleri, bir yerde mümkün olanı ve izin istemeyi anlatırsın: yüzebilirim, burada park edebilirsin, pencereyi açabilir miyim?",
+ tk:"Türkçedeki ‘-ebil, -abil’ eki: yüz-ebil-ir-im → I can swim. Olumsuzu ‘-eme, -ama’: yüz-eme-m → I can’t swim.",
+ sm:"can hiç değişmez: I can, she can, they can. -s almaz, do / does istemez, yanına to gelmez. Olumsuzu can’t. Soru yapmak için can’i başa alırsın.",
+ m:[["yüz3 ebilir2 im1","I1 can2 swim3"],["gel3 eme2 m1","I1 can’t2 come3"]],
+ b:[["+","özne + can + V1","She can drive.","O araba kullanabilir."],["−","özne + can’t + V1","I can’t cook.","Yemek yapamam."],["?","Can + özne + V1?","Can you help me?","Bana yardım edebilir misin?"]],
+ ex:[["I can speak two languages.","İki dil konuşabilirim."],["He can’t come tonight.","Bu akşam gelemez."],["Can I open the window?","Pencereyi açabilir miyim?"],["You can buy tickets online.","Biletleri internetten alabilirsin."],["Can they swim?","Yüzebiliyorlar mı?"]],
+ c:[["Hangisi doğru?",["She can swim.","She cans swim.","She can to swim."],0,"can -s almaz ve ardından to gelmez."],["‘Araba kullanabilir misin?’ nasıl denir?",["Can you drive?","Do you can drive?","You can drive?"],0,"Soru için can başa gelir; do kullanılmaz."]],
+ err:[["He cans play the piano.","He can play the piano.","can hiçbir öznede değişmez."],["I can to help you.","I can help you.","can’den sonra fiil yalın gelir."],["Do you can swim?","Can you swim?","can kendi sorusunu yapar."]],
+ f:[["She ___ ride a bike. (olumlu)","can","Bisiklete binebilir."],["I ___ find my keys. (olumsuz)","can’t|cannot","Anahtarlarımı bulamıyorum."],["___ we sit here?","Can","Buraya oturabilir miyiz?"]]},
+{id:"qform",t:"Soru kurma",tr:"‘mı, mi’ yerine kelime sırası",lv:"A1",
+ sc:"Bilgi almak için soru sorarsın. İngilizcede bir cümlenin soru olduğunu kelimelerin sırası gösterir.",
+ tk:"Türkçedeki ‘mı, mi’ eki İngilizcede yoktur. Onun yerine yardımcı fiil öznenin önüne geçer: ‘Geliyor musun?’ → Are you coming?",
+ sm:"Üç adım: 1) Soru kelimesi varsa en başa gelir (What, Where, When, Why, Who, How). 2) Sonra yardımcı fiil (do, does, did, am, is, are, can, will). 3) Sonra özne ve fiil. Cümlede yardımcı fiil yoksa do, does ya da did eklenir. Tek istisna: soru kelimesi cümlenin öznesiyse (Kim aradı?) do kullanılmaz: Who called?",
+ m:[["Nerede1 / yaşıyor4 sun3","Where1 do2 you3 live4"]],
+ b:[["evet / hayır","Yardımcı fiil + özne + fiil?","Do you like jazz?","Caz sever misin?"],["Wh-","Soru kelimesi + yardımcı fiil + özne + fiil?","Where does she work?","O nerede çalışıyor?"],["özne sorusu","Who / What + fiil?","Who lives here?","Burada kim yaşıyor?"]],
+ ex:[["What do you do?","Ne iş yapıyorsun?"],["When did they arrive?","Ne zaman geldiler?"],["Why are you laughing?","Neden gülüyorsun?"],["Who told you?","Sana kim söyledi?"],["Who are you waiting for?","Kimi bekliyorsun?"]],
+ c:[["Hangisi doğru?",["Where does he live?","Where he lives?","Where does he lives?"],0,"Soru kelimesi + does + özne + yalın fiil."],["‘Camı kim kırdı?’ nasıl denir?",["Who broke the window?","Who did break the window?","Who did broke the window?"],0,"Who cümlenin öznesi olduğu için did kullanılmaz; fiil geçmiş hâlde kalır."]],
+ err:[["What you want?","What do you want?","Yardımcı fiil eksik."],["Where did you went?","Where did you go?","did’den sonra fiil yalın gelir."],["Who did call you?","Who called you?","Özne sorusunda did olmaz."]],
+ f:[["___ do you live? — In Bursa.","Where","Nerede yaşıyorsun?"],["What ___ she do? — She’s a nurse.","does","O ne iş yapıyor?"],["Who ___ this cake? It’s great! (make, geçmiş)","made","Bu pastayı kim yaptı?"]]},
+{id:"was",t:"was / were",tr:"‘-dı, -ydı’ eki (isim ve sıfatta)",lv:"A1",
+ sc:"Geçmişte nerede olduğunu, nasıl olduğunu, kaç yaşında olduğunu söylersin: dün evdeydim, film güzeldi.",
+ tk:"Türkçedeki ‘-dı, -ydı’ eki, isim ve sıfatlara gelince: ev-de-ydi-m → I was at home.",
+ sm:"am ve is geçmişte was olur; are geçmişte were olur. Yani I, he, she, it ile was; you, we, they ile were. Olumsuzu wasn’t ve weren’t. Soru için was ya da were başa gelir.",
+ m:[["ev3 de2 ydim1","I1 was1 at2 home3"]],
+ b:[["+","I / He / She / It was — You / We / They were","We were at school.","Okuldaydık."],["−","wasn’t / weren’t","It wasn’t expensive.","Pahalı değildi."],["?","Was / Were + özne …?","Were you tired?","Yorgun muydun?"]],
+ ex:[["I was born in 2001.","2001’de doğdum."],["The weather was great.","Hava harikaydı."],["They were late.","Geç kaldılar."],["Where were you last night?","Dün gece neredeydin?"],["Was the exam difficult?","Sınav zor muydu?"]],
+ c:[["My friends ___ at the party.",["were","was","did"],0,"friends = they, çoğul: were."],["‘Dün evde değildim.’ nasıl denir?",["I wasn’t at home yesterday.","I didn’t at home yesterday.","I weren’t at home yesterday."],0,"I ile was; olumsuzu wasn’t. did, be fiiliyle kullanılmaz."]],
+ err:[["I born in 1999.","I was born in 1999.","be born kalıbında was gerekir."],["We was happy.","We were happy.","we ile were kullanılır."],["Did you were at home?","Were you at home?","be fiilinin sorusu did ile yapılmaz."]],
+ f:[["She ___ a student in 2015.","was","2015’te öğrenciydi."],["___ they at work yesterday?","Were","Dün işte miydiler?"],["The film ___ good. I didn’t like it. (olumsuz)","wasn’t|was not","Film iyi değildi."]]},
+{id:"pas",t:"Past simple",tr:"Geçmiş zaman: ‘-dı, -di’",lv:"A1",mz:"pas",
+ sc:"Geçmişte olmuş ve bitmiş şeyleri anlatırsın: dün sinemaya gittim, geçen yıl İngilizce kursuna başladım.",
+ tk:"Türkçedeki ‘-dı, -di, -du, -dü’ eki: git-ti-m → I went. Olumsuzu: git-me-di-m → I didn’t go.",
+ sm:"Fiilin ikinci hâlini (V2) kullanırsın. Düzenli fiillerde bu -ed’dir (work → worked). Düzensiz fiiller ezberlenir (go → went). Bütün öznelerle aynıdır. Olumsuz ve soruda did gelir; did geçmişi zaten gösterdiği için fiil yalın hâline döner.",
+ m:[["git2 ti2 m1","I1 went2"],["git4 me3 di2 m1","I1 did2 not3 go4"]],
+ b:[["+","özne + V2","I watched a film.","Bir film izledim."],["−","özne + didn’t + V1","I didn’t watch a film.","Film izlemedim."],["?","Did + özne + V1?","Did you watch a film?","Film izledin mi?"]],
+ ex:[["We visited our grandparents.","Büyükanne ve büyükbabamızı ziyaret ettik."],["She bought a new phone.","Yeni bir telefon aldı."],["I didn’t see him yesterday.","Onu dün görmedim."],["Did they win the match?","Maçı kazandılar mı?"],["Where did you go on holiday?","Tatilde nereye gittin?"]],
+ c:[["Hangisi doğru?",["I didn’t go.","I didn’t went.","I not went."],0,"didn’t’tan sonra fiil yalın (V1) gelir."],["She ___ a letter yesterday.",["wrote","writed","write"],0,"write düzensizdir: write → wrote."]],
+ err:[["Did you saw the film?","Did you see the film?","did varsa fiil yalın gelir."],["He goed home.","He went home.","go düzensizdir."],["I was go to school.","I went to school.","Past simple’da was kullanılmaz."]],
+ vs:["Past simple mi, present perfect mi?","Zaman belli","I saw her yesterday.","Zaman belli değil","I’ve seen her before.","Cümlede ‘ne zaman’ yazıyorsa past simple."],
+ f:[["They ___ football last Sunday. (play)","played","Geçen pazar futbol oynadılar."],["I ___ breakfast this morning. (have, olumsuz)","didn’t have|did not have","Bu sabah kahvaltı yapmadım."],["___ you call me last night?","Did","Dün gece beni aradın mı?"]]},
+{id:"there",t:"there is / there are",tr:"‘var’ ve ‘yok’",lv:"A1",
+ sc:"Bir yerde bir şeyin var ya da yok olduğunu söylersin: masada bir kitap var, burada banka yok.",
+ tk:"Türkçedeki ‘var’ ve ‘yok’: ‘Sokağımda bir market var.’ → There is a shop on my street.",
+ sm:"Tek şey için there is (kısaca there’s), birden fazla için there are. Yok demek için there isn’t ya da there aren’t. Sormak için is ya da are başa gelir. Olumluda some, olumsuz ve soruda any sık kullanılır.",
+ m:[["Masada3 / bir_kitap2 / var1","There_is1 a_book2 on_the_table3"]],
+ b:[["+","There is + tekil / There are + çoğul","There are two parks.","İki park var."],["−","There isn’t a… / There aren’t any…","There isn’t a cinema.","Sinema yok."],["?","Is there a…? / Are there any…?","Is there a bank near here?","Buralarda banka var mı?"]],
+ ex:[["There’s a café next to the hotel.","Otelin yanında bir kafe var."],["There are some books on the shelf.","Rafta birkaç kitap var."],["There aren’t any buses at night.","Gece otobüs yok."],["Are there any questions?","Soru var mı?"],["There was a concert yesterday.","Dün bir konser vardı."]],
+ c:[["There ___ three chairs in the room.",["are","is","have"],0,"three chairs çoğul: there are."],["‘Buzdolabında süt yok.’ nasıl denir?",["There isn’t any milk in the fridge.","There aren’t milk in the fridge.","It hasn’t milk in the fridge."],0,"milk sayılamaz, tekil sayılır: there isn’t any."]],
+ err:[["It has a park in my town.","There is a park in my town.","‘Var’ için there is / are kullanılır."],["There is two cats.","There are two cats.","Çoğulda are."],["Have a bank here?","Is there a bank here?","Soru is there ile kurulur."]],
+ f:[["There ___ a museum in the centre.","is|’s","Merkezde bir müze var."],["___ there any shops near here?","Are","Buralarda dükkân var mı?"],["There ___ any eggs. (olumsuz)","aren’t|are not","Hiç yumurta yok."]]},
+{id:"prep",t:"in, on, under, next to",tr:"Yer bildiren ekler: ‘-de, -in üstünde’",lv:"A1",
+ sc:"Bir şeyin nerede olduğunu söylersin: masanın üstünde, çantanın içinde, bankanın yanında.",
+ tk:"Türkçede yer bilgisi ismin sonuna eklenir (çanta-da, masanın üstünde). İngilizcede ismin önüne ayrı bir kelime gelir: in the bag, on the table.",
+ sm:"in = içinde, on = üstünde, under = altında, next to = yanında, opposite = karşısında, between = arasında, behind = arkasında, in front of = önünde, near = yakınında. Sıra hep aynıdır: edat + the + isim.",
+ m:[["çanta3 nın2 / içinde1","in1 the2 bag3"],["okul2 da1","at1 school2"]],
+ b:[["yer","edat + (the) + isim","The keys are on the table.","Anahtarlar masanın üstünde."],["iki nokta","between … and …","The bank is between the café and the hotel.","Banka, kafe ile otelin arasında."],["?","Where is / are…?","Where is the station?","İstasyon nerede?"]],
+ ex:[["The cat is under the bed.","Kedi yatağın altında."],["My office is next to the park.","Ofisim parkın yanında."],["The pharmacy is opposite the bank.","Eczane bankanın karşısında."],["There’s a garden behind the house.","Evin arkasında bir bahçe var."],["She’s waiting in front of the cinema.","Sinemanın önünde bekliyor."]],
+ c:[["‘Kitap çantanın içinde.’ nasıl denir?",["The book is in the bag.","The book is the bag in.","The book is on the bag."],0,"Edat ismin önüne gelir; içinde = in."],["The café is ___ the bank and the school.",["between","opposite","next"],0,"İki şeyin arasında: between … and …"]],
+ err:[["The phone is the table on.","The phone is on the table.","Edat isimden önce gelir."],["next the bank","next to the bank","Kalıp next to’dur."],["in front the house","in front of the house","Kalıp in front of’tur."]],
+ f:[["The shoes are ___ the bed. (altında)","under","Ayakkabılar yatağın altında."],["I live ___ to a supermarket. (yanında)","next","Bir süpermarketin yanında oturuyorum."],["The hotel is ___ the station. (karşısında)","opposite","Otel istasyonun karşısında."]]},
+{id:"ing",t:"like + -ing, want + to",tr:"‘-meyi’ ve ‘-mek’",lv:"A1",
+ sc:"Yapmayı sevdiğin ve sevmediğin şeyleri söylersin: yüzmeyi severim, beklemekten nefret ederim. İki fiili art arda kullanmanın kuralını da öğrenirsin.",
+ tk:"Türkçedeki ‘-mayı, -meyi’ ve ‘-mak, -mek’: yüz-meyi severim → I like swimming; git-mek istiyorum → I want to go.",
+ sm:"İki fiil yan yana gelince ikincisi ya -ing alır ya da önüne to gelir. Hangisi olacağını ilk fiil belirler. Sevme fiilleri (like, love, enjoy, hate, don’t mind) -ing ister. İstek ve plan fiilleri (want, need, decide, hope, would like) to ister.",
+ m:[["yüz3 meyi2 / sev4 erim1","I1 like4 swim3 -ing2"],["git3 mek2 / isti4 yorum1","I1 want4 to2 go3"]],
+ b:[["-ing","like / love / enjoy / hate + V-ing","She loves dancing.","Dans etmeyi çok sever."],["to","want / need / decide / hope + to V1","I want to learn Spanish.","İspanyolca öğrenmek istiyorum."],["?","Do you like + V-ing?","Do you like cooking?","Yemek yapmayı sever misin?"]],
+ ex:[["I enjoy reading in bed.","Yatakta kitap okumaktan keyif alırım."],["He hates waiting.","Beklemekten nefret eder."],["We decided to stay at home.","Evde kalmaya karar verdik."],["I don’t mind working late.","Geç saate kadar çalışmak benim için sorun değil."],["She needs to buy a ticket.","Bilet alması gerekiyor."]],
+ c:[["I enjoy ___ films.",["watching","to watch","watch"],0,"enjoy’dan sonra -ing gelir."],["We want ___ a new car.",["to buy","buying","buy"],0,"want’tan sonra to + yalın fiil gelir."]],
+ err:[["I like swim.","I like swimming.","like’tan sonra fiil -ing alır."],["She wants going home.","She wants to go home.","want, to ister."],["I enjoy to cook.","I enjoy cooking.","enjoy, -ing ister."]],
+ f:[["I love ___ to music. (listen)","listening","Müzik dinlemeyi çok severim."],["He decided ___ a taxi. (take)","to take","Taksiye binmeye karar verdi."],["Do you mind ___? (wait)","waiting","Beklemen sorun olur mu?"]]},
+{id:"obj",t:"me, him, her, us, them",tr:"‘beni, onu, bize’",lv:"A1",
+ sc:"Bir kişiden ya da şeyden ikinci kez bahsederken adını tekrar etmezsin: Onu tanıyorum. Beni ara. Onları sevdim.",
+ tk:"beni, bana = me; seni, sana = you; onu, ona = him (erkek), her (kadın), it (nesne); bizi, bize = us; onları, onlara = them.",
+ sm:"Cümlenin başındaki ‘yapan’ kişi için I, he, she, we, they kullanılır. Fiilden ya da edattan sonra gelen ‘etkilenen’ kişi için me, him, her, us, them kullanılır. you ve it iki yerde de aynıdır.",
+ m:[["Ben1 / onu3 / seviyorum2","I1 love2 her3"]],
+ b:[["fiilden sonra","özne + fiil + me / him / her / it / us / them","I know him.","Onu tanıyorum."],["edattan sonra","with / for / to + me, him, her…","Come with us.","Bizimle gel."],["?","Do you know + him / her / them?","Do you know them?","Onları tanıyor musun?"]],
+ ex:[["Call me tomorrow.","Beni yarın ara."],["I saw her at the station.","Onu istasyonda gördüm."],["This present is for you.","Bu hediye senin için."],["Can you help us?","Bize yardım edebilir misin?"],["I like these shoes.","Bu ayakkabıları beğendim."]],
+ c:[["That’s my brother. Do you know ___?",["him","he","his"],0,"Fiilden sonra him, her, them gelir; erkek için him."],["Hangisi doğru?",["She loves me.","She loves I.","Her loves me."],0,"Yapan kişi she, etkilenen kişi me."]],
+ err:[["I love she.","I love her.","Fiilden sonra her kullanılır."],["Give it to I.","Give it to me.","Edattan sonra me gelir."],["Me like pizza.","I like pizza.","Cümlenin öznesi I’dır."]],
+ f:[["Where are my keys? I can’t find ___.","them","Anahtarlarım nerede? Bulamıyorum."],["We’re lost. Can you help ___?","us","Kaybolduk. Yardım eder misin?"],["She’s nice. I like ___.","her","O iyi biri. Onu seviyorum."]]},
+{id:"going",t:"be going to",tr:"Planlar: ‘-ecek, -acak’",lv:"A1",mz:"going",
+ sc:"Önceden karar verdiğin planları ve niyetlerini anlatırsın: yarın annemi ziyaret edeceğim, bu yaz araba kullanmayı öğreneceğim.",
+ tk:"Türkçedeki ‘-ecek, -acak’ eki, plan anlamında: oku-yacağ-ım → I’m going to read.",
+ sm:"Kalıp üç parçadır: be (am, is, are) + going to + yalın fiil. Değişen tek parça be’dir. Buradaki going ‘gitmek’ anlamına gelmez, sadece gelecek işaretidir. Randevu gibi kesinleşmiş planlarda present continuous da kullanılır: I’m meeting Ali at six.",
+ m:[["oku3 yacağ2 ım1","I1 am_going_to2 read3"],["O1 / gel4 me3 yecek2","He1 is2 not3 going_to2 come4"]],
+ b:[["+","özne + am / is / are + going to + V1","We’re going to move.","Taşınacağız."],["−","am not / isn’t / aren’t + going to + V1","She isn’t going to come.","O gelmeyecek."],["?","Am / Is / Are + özne + going to + V1?","Are you going to study?","Ders çalışacak mısın?"]],
+ ex:[["I’m going to call her tonight.","Bu akşam onu arayacağım."],["They’re going to buy a house.","Ev alacaklar."],["He isn’t going to drive.","Araba kullanmayacak."],["What are you going to do tomorrow?","Yarın ne yapacaksın?"],["It’s going to rain.","Yağmur yağacak."]],
+ c:[["Hangisi doğru?",["She is going to travel.","She going to travel.","She is going travel."],0,"Üç parça da gerekir: is + going to + fiil."],["We ___ going to stay at home.",["are","is","do"],0,"we ile are kullanılır."]],
+ err:[["I going to study.","I’m going to study.","be (am) eksik."],["He is going to studies.","He is going to study.","going to’dan sonra fiil yalın gelir."],["Do you going to come?","Are you going to come?","Soru be ile kurulur."]],
+ vs:["going to mu, will mi?","Önceden verilmiş karar","I’m going to visit my aunt on Sunday.","Şu anda verilen karar","The phone’s ringing. I’ll get it.","Plan yaptıysan going to; o anda karar verdiysen will."],
+ f:[["I ___ going to buy a bike.","am|’m","Bisiklet alacağım."],["They aren’t going ___ late. (be)","to be","Geç kalmayacaklar."],["___ she going to call you?","Is","Seni arayacak mı?"]]},
+{id:"wlike",t:"would like",tr:"Kibar istek: ‘isterim, rica ediyorum’",lv:"A1",
+ sc:"Kibarca bir şey isterken ya da hayalini söylerken kullanırsın: bir kahve rica ediyorum, bir gün Japonya’yı görmek isterim.",
+ tk:"Türkçedeki ‘isterim, rica ediyorum’: ‘Bir çay isterim.’ → I’d like a tea. want ile aynı anlamdadır ama daha kibardır.",
+ sm:"would like, want’ın kibar hâlidir. Kısaltması ’d like. Ardından ya bir isim gelir (I’d like a coffee) ya da to + fiil (I’d like to go). Teklif ederken: Would you like…? Dikkat: like = sevmek, would like = istemek.",
+ m:[["git3 mek2 / ister4 im1","I1 would_like4 to2 go3"]],
+ b:[["isim","I’d like + isim","I’d like a sandwich.","Bir sandviç istiyorum."],["fiil","I’d like + to V1","I’d like to visit Rome.","Roma’yı ziyaret etmek isterim."],["?","Would you like…?","Would you like some tea?","Çay ister misiniz?"]],
+ ex:[["I’d like a table for two, please.","İki kişilik bir masa rica ediyorum."],["She’d like to be a pilot.","Pilot olmak istiyor."],["Would you like to come with us?","Bizimle gelmek ister misin?"],["We’d like to pay by card.","Kartla ödemek istiyoruz."],["Would you like a drink?","İçecek ister misiniz?"]],
+ c:[["Kafede hangisi daha kibar?",["I’d like a coffee, please.","I want a coffee.","Give me a coffee."],0,"would like, want’ın kibar hâlidir."],["I’d like ___ a doctor.",["to see","see","seeing"],0,"would like’tan sonra to + yalın fiil gelir."]],
+ err:[["I like a coffee, please.","I’d like a coffee, please.","like = severim; sipariş için would like."],["I’d like go home.","I’d like to go home.","to eksik."],["Do you would like tea?","Would you like tea?","Soru would ile başlar."]],
+ f:[["I ___ like a glass of water.","would|’d","Bir bardak su rica ediyorum."],["Would you like ___ a film? (watch)","to watch","Film izlemek ister misin?"],["___ you like some cake?","Would","Biraz pasta ister misin?"]]},
+{id:"hgot",t:"have got / has got",tr:"‘-ım var, -ım yok’",lv:"A2",
+ sc:"Sahip olduğun şeyleri, aile bireylerini ve dış görünüşü anlatırsın: iki kardeşim var, mavi gözleri var, arabam yok.",
+ tk:"Türkçedeki ‘-ım var, -ım yok’: ‘Bir arabam var.’ → I’ve got a car. Dikkat: there is ‘bir yerde var’, have got ‘bende var’ demektir.",
+ sm:"have got, have (sahip olmak) ile aynı anlamdadır ve İngiliz İngilizcesinde konuşurken çok kullanılır. he, she, it ile has got olur. Olumsuzu haven’t got ve hasn’t got. Soruda have ya da has başa gelir. Amerikan İngilizcesinde aynı anlam do ile kurulur: Do you have…?",
+ m:[["araba2 m1 / var3","I1 have_got3 a_car2"]],
+ b:[["+","I / You / We / They have got — He / She / It has got","She’s got a dog.","Bir köpeği var."],["−","haven’t got / hasn’t got","We haven’t got time.","Zamanımız yok."],["?","Have / Has + özne + got…?","Have you got a pen?","Kalemin var mı?"]],
+ ex:[["I’ve got two sisters.","İki kız kardeşim var."],["He’s got brown eyes.","Kahverengi gözleri var."],["They haven’t got a garden.","Bahçeleri yok."],["Has she got a car?","Arabası var mı?"],["I’ve got a headache.","Başım ağrıyor."]],
+ c:[["My brother ___ got a new job.",["has","have","is"],0,"brother = he: has got."],["‘Kardeşin var mı?’ nasıl denir?",["Have you got any brothers or sisters?","Do you got any brothers?","Are you got a brother?"],0,"Soru have ile başlar: Have you got…?"]],
+ err:[["She have got a cat.","She has got a cat.","he, she, it ile has."],["I haven’t a car.","I haven’t got a car.","Olumsuzda got unutulmaz."],["There is a brother.","I’ve got a brother.","Sahiplik için have got kullanılır."]],
+ f:[["We ___ got a big kitchen.","have|’ve","Büyük bir mutfağımız var."],["He ___ got any money. (olumsuz)","hasn’t|has not","Hiç parası yok."],["___ they got children?","Have","Çocukları var mı?"]]},
+{id:"count",t:"some, any, much, many",tr:"Sayılabilen ve sayılamayan isimler",lv:"A2",
+ sc:"Yiyecek, içecek ve eşyaların miktarını söylersin: biraz süt, birkaç elma, çok para, hiç ekmek yok.",
+ tk:"Türkçede ‘iki su, üç ekmek’ deriz. İngilizcede su, ekmek, para gibi şeyler sayılmaz; ‘biraz’ ya da bir kap ile söylenir: some water, a bottle of water.",
+ sm:"İki grup var. Sayılabilenler: tek tek sayabildiğin şeyler (an apple, two apples). Sayılamayanlar: sıvılar, tozlar ve soyut şeyler (water, rice, money, time); bunlar çoğul olmaz, a / an almaz. Olumlu cümlede some, olumsuz ve soruda any kullanılır. Miktar sorarken sayılabilenle How many, sayılamayanla How much.",
+ b:[["sayılabilen","a / an, some + çoğul, How many…?","How many eggs do we need?","Kaç yumurta lazım?"],["sayılamayan","some, How much…?","How much milk is there?","Ne kadar süt var?"],["− ve ?","any","We haven’t got any bread.","Hiç ekmeğimiz yok."]],
+ ex:[["I’d like some water.","Biraz su istiyorum."],["There are a few tomatoes.","Birkaç domates var."],["I drink a lot of tea.","Çok çay içerim."],["She puts a little sugar in her coffee.","Kahvesine biraz şeker koyar."],["Is there any cheese?","Hiç peynir var mı?"]],
+ c:[["How ___ money have you got?",["much","many","lot"],0,"money sayılamaz: How much."],["Hangisi doğru?",["some bread","a bread","two breads"],0,"bread sayılamaz; a / an ve çoğul almaz."]],
+ err:[["How many water?","How much water?","water sayılamaz."],["I need an information.","I need some information.","information sayılamaz."],["There aren’t some eggs.","There aren’t any eggs.","Olumsuzda any kullanılır."]],
+ f:[["How ___ apples do you want?","many","Kaç elma istiyorsun?"],["There isn’t ___ milk in the fridge.","any","Buzdolabında hiç süt yok."],["Can I have ___ rice, please?","some","Biraz pilav alabilir miyim?"]]},
+{id:"comp",t:"Karşılaştırma: -er, more, the -est",tr:"‘daha’ ve ‘en’",lv:"A2",
+ sc:"İki şeyi karşılaştırır ya da bir grubun ‘en’ini söylersin: Ali benden uzun, bu en ucuz otel.",
+ tk:"Türkçedeki ‘daha’ → -er ya da more; ‘en’ → the -est ya da the most; ‘-den’ → than. ‘Ali’den daha uzun’ → taller than Ali.",
+ sm:"Kısa sıfatlara (tek hece) -er ve -est eklenir: tall, taller, the tallest. Uzun sıfatların önüne more ve the most gelir: more expensive, the most expensive. -y ile bitenler -ier ve -iest olur (easy, easier). Üç düzensiz: good, better, the best; bad, worse, the worst; far, further, the furthest.",
+ m:[["Ali3 ’den2 / daha_uzun1","taller1 than2 Ali3"],["en1 / pahalı2 / otel3","the_most1 expensive2 hotel3"]],
+ b:[["daha","sıfat + -er + than / more + sıfat + than","The train is faster than the bus.","Tren otobüsten daha hızlı."],["en","the + sıfat + -est / the most + sıfat","It’s the cheapest hotel in town.","Şehirdeki en ucuz otel."],["eşit","as + sıfat + as","I’m as tall as my dad.","Babam kadar uzunum."]],
+ ex:[["My sister is older than me.","Ablam benden büyük."],["This book is more interesting than that one.","Bu kitap ondan daha ilginç."],["He’s the best player in the team.","Takımdaki en iyi oyuncu o."],["Today is hotter than yesterday.","Bugün dünden daha sıcak."],["It was the worst film of the year.","Yılın en kötü filmiydi."]],
+ c:[["Hangisi doğru?",["more comfortable","comfortabler","more comfortabler"],0,"Uzun sıfatlarla more kullanılır; -er eklenmez."],["She’s ___ student in the class.",["the best","the better","the goodest"],0,"good → better → the best. ‘En’ için the best."]],
+ err:[["more big","bigger","Kısa sıfat -er alır."],["He is taller from me.","He is taller than me.","‘-den’ = than."],["the most cheap","the cheapest","Kısa sıfat -est alır."]],
+ f:[["A plane is ___ than a car. (fast)","faster","Uçak arabadan hızlıdır."],["This is the ___ day of my life. (happy)","happiest","Bu, hayatımın en mutlu günü."],["Hotels are ___ expensive than hostels.","more","Oteller hostellerden daha pahalı."]]},
+{id:"pc",t:"Present continuous",tr:"Şimdiki zaman: ‘-iyor’",lv:"A2",mz:"pc",
+ sc:"Tam şu anda olan ya da bu aralar geçici olarak süren şeyleri anlatırsın: şu an ders çalışıyorum, bu hafta evden çalışıyorum.",
+ tk:"Türkçedeki ‘-iyor’ eki, ‘şu anda’ anlamında: çalış-ıyor-um → I am working.",
+ sm:"İki parça: be (am, is, are) + fiil-ing. be özneye göre değişir, -ing hiç değişmez. Olumsuz için not eklenir, soru için be başa gelir. know, like, want, need gibi ‘durum’ fiilleri -ing almaz: I know denir, I am knowing denmez.",
+ m:[["çalış3 ıyor2 um1","I1 am2 work3 -ing2"],["O1 / gel4 mi3 yor2","She1 is2 not3 come4 -ing2"]],
+ b:[["+","özne + am / is / are + V-ing","They’re playing.","Oynuyorlar."],["−","am not / isn’t / aren’t + V-ing","He isn’t sleeping.","Uyumuyor."],["?","Am / Is / Are + özne + V-ing?","Are you listening?","Dinliyor musun?"]],
+ ex:[["I’m reading a great book.","Harika bir kitap okuyorum."],["She’s talking on the phone.","Telefonda konuşuyor."],["We aren’t working today.","Bugün çalışmıyoruz."],["What are you doing?","Ne yapıyorsun?"],["It’s raining.","Yağmur yağıyor."]],
+ c:[["Look! The baby ___.",["is sleeping","sleeps","sleeping"],0,"Şu anda olan eylem: is + -ing."],["Hangisi doğru?",["I know the answer.","I am knowing the answer.","I knowing the answer."],0,"know bir durum fiilidir; -ing almaz."]],
+ err:[["She working now.","She is working now.","be (is) eksik."],["I am work.","I am working.","-ing eksik."],["Are you understanding?","Do you understand?","understand durum fiilidir."]],
+ vs:["Present simple mi, present continuous mu?","Her zaman","She works in a bank.","Şu an ya da geçici","She’s working from home today.","now, at the moment, today → continuous; always, every day → simple."],
+ f:[["They ___ watching TV.","are|’re","Televizyon izliyorlar."],["He ___ working today. (olumsuz)","isn’t|is not","Bugün çalışmıyor."],["What ___ you cooking?","are","Ne pişiriyorsun?"]]},
+{id:"oblig",t:"have to, must, should",tr:"‘zorunda’ ve ‘-meli’",lv:"A2",mz:"modal",
+ sc:"Kuralları, zorunlulukları ve tavsiyeleri anlatırsın: kask takmak zorundasın, burada sigara içemezsin, doktora gitmelisin.",
+ tk:"‘-mek zorunda’ → have to ya da must. Tavsiye anlamındaki ‘-meli’ → should. ‘zorunda değil’ → don’t have to. ‘yasak’ → mustn’t.",
+ sm:"Dört kutu düşün. Gerekli: have to, must. Gerekli değil, istersen yap: don’t have to. Yasak: mustn’t. İyi olur, tavsiye: should. En sık yapılan hata don’t have to ile mustn’t’ı karıştırmaktır; biri ‘şart değil’, diğeri ‘yasak’ demektir. he, she, it ile has to olur.",
+ m:[["git3 mek_zorunda2 yım1","I1 have_to2 go3"],["git3 meli2 sin1","You1 should2 go3"]],
+ b:[["zorunlu","have to / has to / must + V1","You have to wear a helmet.","Kask takmak zorundasın."],["şart değil, yasak","don’t have to + V1 / mustn’t + V1","You don’t have to pay. You mustn’t smoke.","Ödemen şart değil. Sigara içmek yasak."],["tavsiye","should / shouldn’t + V1","You should rest.","Dinlenmelisin."]],
+ ex:[["I have to get up early tomorrow.","Yarın erken kalkmam lazım."],["She has to work on Saturdays.","Cumartesileri çalışmak zorunda."],["You mustn’t use your phone here.","Burada telefon kullanmak yasak."],["We don’t have to hurry.","Acele etmemize gerek yok."],["You shouldn’t eat so much sugar.","Bu kadar şeker yememelisin."]],
+ c:[["Müze ücretsiz. You ___ pay.",["don’t have to","mustn’t","have to"],0,"‘Şart değil’ = don’t have to. mustn’t ‘yasak’ demektir."],["She ___ to wear a uniform.",["has","have","must"],0,"she ile has to. must’tan sonra to gelmez."]],
+ err:[["You must to go.","You must go.","must’tan sonra to gelmez."],["He have to work.","He has to work.","he ile has to."],["She shoulds rest.","She should rest.","should -s almaz."]],
+ f:[["You ___ see a doctor. (tavsiye)","should","Doktora görünmelisin."],["It’s Sunday. I don’t ___ to work.","have","Pazar. Çalışmam gerekmiyor."],["You ___ park here. It’s forbidden.","mustn’t|must not","Buraya park etmek yasak."]]},
+{id:"art",t:"a, an, the",tr:"Türkçede olmayan küçük kelimeler",lv:"A2",
+ sc:"İsimlerin önüne a, an ya da the koyup koymayacağına karar verirsin. Türkçede olmadığı için en çok unutulan konudur.",
+ tk:"a / an ≈ ‘bir’ (herhangi bir). the ≈ ‘o bildiğimiz’ (belirli). Türkçede ‘kitabı okudum’ derken ‘-ı’ belirlilik gösterir; İngilizcede bunu the yapar: I read the book.",
+ sm:"Kendine iki soru sor. 1) Dinleyen hangisinden bahsettiğimi biliyor mu? Evet ise the. Hayır ve tek bir şeyse a / an. 2) Genel olarak mı konuşuyorum (kediler, müzik, hayat)? O zaman hiçbir şey koyma: Cats are cute. İlk bahsedişte a, ikincide the: I saw a dog. The dog was big.",
+ m:[["kitab2 ı1","the1 book2"]],
+ b:[["a / an","ilk kez, herhangi bir, meslek","She’s a doctor. I bought a jacket.","O bir doktor. Bir ceket aldım."],["the","bilinen, tek olan, ikinci bahsediş","The jacket was expensive. The sun is hot.","Ceket pahalıydı. Güneş sıcak."],["yok","genel çoğul, sayılamayan, ülke, şehir, öğün","I love music. She lives in Italy.","Müziği severim. İtalya’da yaşıyor."]],
+ ex:[["Can you close the door?","Kapıyı kapatabilir misin?"],["I’ve got a brother and a sister.","Bir erkek, bir kız kardeşim var."],["Dogs are friendly animals.","Köpekler cana yakın hayvanlardır."],["The food was great.","Yemekler harikaydı."],["I go to work by bus.","İşe otobüsle giderim."]],
+ c:[["___ moon is beautiful tonight.",["The","A","An"],0,"Tek olan şeylerle the kullanılır."],["Genel olarak konuşuyorsun. Hangisi doğru?",["I like coffee.","I like the coffee.","I like a coffee."],0,"Genel konuşurken sayılamayan isim hiçbir şey almaz."]],
+ err:[["She is engineer.","She is an engineer.","Mesleklerde a / an kullanılır."],["I love the music.","I love music.","Genel anlamda the kullanılmaz."],["I go to the bed at eleven.","I go to bed at eleven.","go to bed, work, school kalıplarında the yok."]],
+ f:[["We stayed at a hotel. ___ hotel was lovely.","The","Bir otelde kaldık. Otel çok güzeldi."],["He’s ___ actor.","an","O bir oyuncu."],["Can you pass ___ salt, please?","the","Tuzu uzatır mısın?"]]},
+{id:"will",t:"will, won’t, might",tr:"Tahmin: ‘-ecek’ ve ‘belki’",lv:"A2",mz:"will",
+ sc:"Gelecek hakkında tahmin yaparsın, o anda karar verirsin ya da söz verirsin: yarın yağmur yağacak, belki gelirim, sana yardım ederim.",
+ tk:"will = ‘-ecek’ (eminim) ya da söz veren ‘-erim’. might = ‘belki … -ebilir’. won’t = ‘-meyecek’.",
+ sm:"Ne kadar eminsin? Eminsen will. Olmayacağından eminsen won’t. Emin değilsen might. Üçü de tüm öznelerle aynıdır ve ardından yalın fiil gelir. will’in kısaltması ’ll. Kapı çaldığında ‘Ben açarım’ demek gibi anlık kararlar da will ile söylenir.",
+ m:[["O1 / gel3 ecek2","She1 will2 come3"],["Belki2 / gel3 irim1","I1 might2 come3"]],
+ b:[["emin","will / won’t + V1","It will be sunny. She won’t be late.","Güneşli olacak. Geç kalmayacak."],["belki","might / might not + V1","We might go out.","Belki dışarı çıkarız."],["?","Will + özne + V1?","Will you be at home?","Evde olacak mısın?"]],
+ ex:[["I think you’ll like this film.","Bence bu filmi seveceksin."],["I’ll help you.","Sana yardım ederim."],["It might rain later.","Sonra yağmur yağabilir."],["He won’t tell anyone.","Kimseye söylemez."],["Will they win the match?","Maçı kazanacaklar mı?"]],
+ c:[["Emin değilsin. I ___ come to the party.",["might","will","won’t"],0,"Emin değilsen might."],["Hangisi doğru?",["She will call you.","She will calls you.","She wills call you."],0,"will değişmez ve fiil yalın gelir."]],
+ err:[["I will to help you.","I will help you.","will’den sonra to gelmez."],["It mights rain.","It might rain.","might -s almaz."],["I don’t will come.","I won’t come.","will’in olumsuzu won’t’tur."]],
+ f:[["A: I’m cold. B: I ___ close the window.","will|’ll","Üşüdüm. — Pencereyi kapatayım."],["Take an umbrella. It ___ rain. (belki)","might|may","Şemsiye al. Yağmur yağabilir."],["Don’t worry. I ___ forget. (olumsuz)","won’t|will not","Merak etme. Unutmam."]]},
+{id:"manner",t:"slowly, carefully, well",tr:"Nasıl? ‘-ce, -ca’",lv:"A2",
+ sc:"Bir işin nasıl yapıldığını söylersin: yavaş konuş, dikkatli sür, iyi yüzer.",
+ tk:"Türkçede ‘yavaş’ hem sıfat hem zarftır. İngilizcede ayrılır: slow = yavaş (ismi anlatır), slowly = yavaşça (fiili anlatır). ‘-ce, -ca’ ≈ -ly.",
+ sm:"Sıfatın sonuna -ly ekle: quick → quickly, careful → carefully. -y ile bitiyorsa -ily: easy → easily. Üç istisna ezberlenir: good → well, fast → fast, hard → hard. Yeri: fiilden ve varsa nesneden sonra. Kendine sor: ismi mi anlatıyorum (sıfat), yoksa fiili mi (zarf)?",
+ m:[["yavaş1 ça2","slow1 -ly2"]],
+ b:[["zarf","fiil (+ nesne) + sıfat-ly","She speaks quietly.","Sessizce konuşur."],["düzensiz","good → well, fast → fast, hard → hard","He plays well.","İyi oynar."],["sıfat","be + sıfat / sıfat + isim","He is a careful driver.","O dikkatli bir sürücü."]],
+ ex:[["Please drive carefully.","Lütfen dikkatli sür."],["He ran quickly to the door.","Kapıya hızla koştu."],["She speaks English very well.","İngilizceyi çok iyi konuşur."],["They work hard.","Çok çalışırlar."],["I can easily finish it today.","Bugün kolayca bitirebilirim."]],
+ c:[["She sings ___.",["beautifully","beautiful","beauty"],0,"Fiili (sings) anlattığı için zarf gerekir."],["He’s a ___ player. He plays ___.",["good / well","well / good","good / good"],0,"İsimden önce sıfat (good), fiilden sonra zarf (well)."]],
+ err:[["He drives careful.","He drives carefully.","Fiili zarf anlatır."],["She speaks English good.","She speaks English well.","good’un zarfı well’dir."],["He works hardly.","He works hard.","hard değişmez; hardly ‘neredeyse hiç’ demektir."]],
+ f:[["Please speak ___. (slow)","slowly","Lütfen yavaş konuş."],["She did the test ___. (easy)","easily","Testi kolayca yaptı."],["They played very ___ yesterday. (good)","well","Dün çok iyi oynadılar."]]},
+{id:"pp",t:"Present perfect",tr:"Şimdiyle bağlı geçmiş: have + V3",lv:"A2",mz:"pp",
+ sc:"Geçmişte olmuş ama şimdiyle bağı olan şeyleri anlatırsın: hayatında yaptığın deneyimler, az önce olan şeyler, bir süredir devam eden durumlar. Ne zaman olduğu önemli değildir ya da söylenmez.",
+ tk:"Türkçede ayrı bir zaman yoktur; ‘-dı’ ya da ‘-dır’ ile çevrilir. ‘Hiç Paris’e gittin mi?’ → Have you ever been to Paris? ‘Beş yıldır burada yaşıyorum.’ → I’ve lived here for five years.",
+ sm:"Kalıp: have ya da has + fiilin 3. hâli (V3). Üç kullanım var. 1) Deneyim: I’ve been to Rome; ne zaman olduğu belli değil. 2) Az önce ya da henüz: I’ve just finished. 3) Hâlâ süren durum: for + süre, since + başlangıç. Altın kural: cümlede dün, geçen yıl, 2019’da gibi belirli bir geçmiş zaman varsa present perfect kullanılmaz; past simple kullanılır.",
+ m:[["bitir3 di2 m1","I1 have2 finish3 -ed2"],["Ben1 / beş_yıl4 dır3 / burada5 / yaşıyorum2","I1 have_lived2 here5 for3 five_years4"]],
+ b:[["+","özne + have / has + V3","I’ve seen that film.","O filmi izledim."],["−","haven’t / hasn’t + V3","She hasn’t called yet.","Henüz aramadı."],["?","Have / Has + özne + (ever) + V3?","Have you ever eaten sushi?","Hiç suşi yedin mi?"]],
+ ex:[["I’ve never been to Japan.","Japonya’ya hiç gitmedim."],["She’s just left.","Az önce çıktı."],["We’ve lived here since 2020.","2020’den beri burada yaşıyoruz."],["Have you finished your homework yet?","Ödevini bitirdin mi?"],["He’s already paid.","Çoktan ödedi."]],
+ c:[["I ___ him yesterday.",["saw","have seen","’ve saw"],0,"yesterday belirli bir geçmiş zaman: past simple."],["She has worked here ___ three years.",["for","since","ago"],0,"Süre için for; başlangıç noktası için since."]],
+ err:[["I have seen him last week.","I saw him last week.","Belirli zaman varsa past simple."],["She have finished.","She has finished.","she ile has."],["I live here since 2019.","I’ve lived here since 2019.","‘-den beri’ present perfect ister."]],
+ vs:["Present perfect mi, past simple mi?","Ne zaman önemsiz","I’ve lost my keys.","Ne zaman belli","I lost my keys yesterday.","Zaman söylenmişse past simple."],
+ f:[["Have you ever ___ a horse? (ride)","ridden","Hiç ata bindin mi?"],["I’ve known her ___ 2015.","since","Onu 2015’ten beri tanıyorum."],["He ___ just arrived.","has|’s","Az önce geldi."]]}
+];
+const GLI={};GL.forEach(x=>GLI[x.id]=x);
+const GMAP={
+starter:[["be","be"],["be","poss"],["this","plur"],["ps","ps"],["ps","freq"],["can","qform"],["was","pas"],["there","prep"],["ing","obj"],["going","wlike"]],
+elementary:[["be","this"],["ps","ps"],["hgot","freq"],["there","can"],["count","count"],["was","pas"],["comp","comp"],["pc","pc"],["oblig","art"],["going","will"],["oblig","manner"],["pp","pp"]],
+preint:[["qform","pas"],["pc","freq"],["going","qform"],["pp","oblig"],[null,"ing"],["pp","will"],[null,null],[null,"count"],["comp","art"],[null,null],["pp",null],[null,null]],
+intermediate:[["qform",null],["pp",null],["going","will"],["oblig",null],["comp",null],[null,null],[null,null],["art",null],[null,null],[null,null]]};
+const libOf=(S,u,gi)=>{const id=((GMAP[S.id]||[])[u.n-1]||[])[gi];return id?GLI[id]:null;};
+function mirHTML(m){const P=(s,en)=>{const o=[];s.split(" ").forEach(t=>{if(t==="/"){o.push({gap:1});return;}const x=t.slice(0,-1).replace(/_/g," ");if(en&&o.length&&!/^[-’]/.test(x))o.push({gap:1});o.push({t:x,n:+t.slice(-1)});});return o;};
+  const row=a=>`<div class="mirrow">${a.map(x=>x.gap?'<span class="mgap"></span>':`<span class="mseg c${x.n}">${esc(x.t)}</span>`).join("")}</div>`;
+  return `<div class="mir"><div class="mirlab">Türkçe</div>${row(P(m[0]))}<div class="mirarrow">⇅ aynı renk aynı anlam, sıra ters</div><div class="mirlab">İngilizce</div>${row(P(m[1],true))}</div>`;}
+function lessonCards(L,detail){const c=[],I=(lbl,h,html)=>c.push({k:"info",lbl,h,html}),chk=x=>c.push({k:"mc",q:x[0],opts:shuffle(x[1].slice()),a:x[1][x[2]],why:x[3],grp:"g"});
+  I("1. Ne işe yarar?",L.t,`<p class="tkr">${esc(L.tr)}</p><p>${gl(L.sc)}</p><div class="tip"><b>Türkçesi:</b> ${gl(L.tk)}</div><h4>Basit anlatım</h4><p>${gl(L.sm)}</p>${detail?`<details><summary>Kısa teknik özet</summary><p>${gl(detail)}</p></details>`:""}<p class="m">Altı çizili terimlere dokunursan anlamı çıkar.</p>`);
+  if(L.m)I("2. Ayna tekniği","Türkçeyi sondan başa çöz",L.m.map(mirHTML).join("")+`<p class="m">Türkçe kelimenin sonundaki ek, İngilizcede en başa ayrı bir kelime olarak gelir. Aynı renkli parçalar birbirinin karşılığı.</p>`);
+  I("3. Nasıl kurulur?","Formül",L.b.map(r=>`<div class="brow"><span class="bsign">${esc(r[0])}</span><div><div class="bform">${gl(r[1])}</div><div class="ben">${sayBtn(r[2])} ${esc(r[2])}</div><div class="btr">${esc(r[3])}</div></div></div>`).join(""));
+  chk(L.c[0]);
+  I("4. Örnekler","Dinle, sesli tekrar et",`<ul class="exs">${L.ex.map(x=>`<li>${sayBtn(x[0])}<span><b>${esc(x[0])}</b><br><span class="m">${esc(x[1])}</span></span></li>`).join("")}</ul>`);
+  chk(L.c[1]);
+  I("5. Sık yapılan hatalar","Bunlara dikkat",L.err.map(e=>`<div class="err"><span class="x">✗ ${esc(e[0])}</span><span class="v">✓ ${esc(e[1])}</span><span class="m">${gl(e[2])}</span></div>`).join(""));
+  if(L.vs)I("6. Karıştırma",L.vs[0],`<div class="cmp"><div><b>${esc(L.vs[1])}</b>${esc(L.vs[2])} ${sayBtn(L.vs[2])}</div><div><b>${esc(L.vs[3])}</b>${esc(L.vs[4])} ${sayBtn(L.vs[4])}</div></div><div class="tip">${esc(L.vs[5])}</div>`);
+  shuffle(L.err.slice()).slice(0,2).forEach(e=>c.push({k:"mc",q:"Hangisi doğru?",opts:shuffle([e[1],e[0]]),a:e[1],why:e[2],grp:"g"}));
+  L.f.forEach(x=>c.push({k:"fill",s:x[0],a:x[1].split("|"),tr:x[2]}));
+  shuffle(L.ex.filter(x=>cleanS(x[0])&&nw(x[0])>=3&&nw(x[0])<=9)).slice(0,2).forEach(x=>c.push({k:"order",s:x[0],tr:x[1]}));
+  return c;}
+function aynaCards(){const I=(lbl,h,html)=>({k:"info",lbl,h,html}),Q=(q,o,why)=>({k:"mc",q,opts:shuffle(o.slice()),a:o[0],why,grp:"g"});return[
+  I("Ayna tekniği 1/5","İngilizce neden ters geliyor?",`<p>Türkçe, bilgiyi fiilin <b>sonuna ek olarak</b> dizer: <b>gel-e-me-di-m</b>. İngilizce aynı bilgiyi fiilin <b>önüne ayrı kelimeler olarak</b> koyar: <b>I could not come</b>.</p><p>Yani iki dil büyük ölçüde birbirinin aynadaki görüntüsü gibidir. Bunu bir kez görünce dilbilgisinin önemli bir kısmı ezber olmaktan çıkar.</p><div class="tip">Next Stop’taki dilbilgisi derslerinde hep aynı üç kuralı kullanacağız.</div>`),
+  I("Ayna tekniği 2/5","Kural 1: Fiili sondan başa oku",`<p>Türkçe fiili eklerine ayır, sonra <b>en sondaki ekten başlayarak</b> İngilizceye çevir.</p>${mirHTML(["gid3 iyor2 um1","I1 am2 go3 -ing2"])}<p class="m">-um → I, -iyor → am …ing, git → go</p>${mirHTML(["konuş3 abilir2 im1","I1 can2 speak3"])}${mirHTML(["git4 me3 di2 m1","I1 did2 not3 go4"])}<p class="m">-m → I, -di → did, -me → not, git → go</p>`),
+  Q("‘Yaz-acak-sın’ fiilini sondan başa çevir:",["You will write.","Write will you.","You write will."],"-sın → you, -acak → will, yaz → write."),
+  I("Ayna tekniği 3/5","Kural 2: Cümleyi de aynala",`<p>Özneyi başa koy. Fiili hemen arkasına getir. Geri kalan parçaları Türkçedeki sıranın <b>tersine</b> diz.</p>${mirHTML(["Ben1 / yarın5 / okulda4 / İngilizce3 / konuşacağım2","I1 will_speak2 English3 at_school4 tomorrow5"])}<p class="m">Türkçede fiil en sonda, İngilizcede özneden hemen sonra durur. Zaman bilgisi Türkçede başa yakın, İngilizcede en sondadır.</p>`),
+  {k:"order",s:"I will speak English at school tomorrow.",tr:"Ben yarın okulda İngilizce konuşacağım."},
+  Q("‘Biz dün parkta futbol oynadık.’ cümlesinin doğru sırası hangisi?",["We played football in the park yesterday.","We yesterday in the park football played.","Yesterday we football played in the park."],"Özne başta, fiil hemen ardından, kalanlar ters sırayla: futbol, parkta, dün."),
+  I("Ayna tekniği 4/5","Kural 3: İsmin ekleri öne geçer",`<p>Türkçede ismin sonuna gelen ekler (-de, -e, -den, -im) İngilizcede ismin <b>önüne ayrı kelime</b> olarak gelir.</p>${mirHTML(["ev3 im2 de1","in1 my2 house3"])}${mirHTML(["okul2 a1","to1 school2"])}${mirHTML(["Ali3 ’den2 / daha_uzun1","taller1 than2 Ali3"])}`),
+  Q("‘Çanta-m-da’ nasıl denir?",["in my bag","my bag in","bag my in"],"-da → in, -m → my, çanta → bag."),
+  I("Ayna tekniği 5/5","Tekniğin sınırları",`<p>Ayna tekniği bir <b>pusula</b>dır, cetvel değil. Çoğu yapıda yön gösterir ama birebir uymadığı yerler vardır:</p><ul class="tips"><li>Geniş zamanın olumlu hâlinde yardımcı fiil görünmez: <b>I work</b>. Olumsuz ve soruda ortaya çıkar: I <b>do</b> not work.</li><li>İngilizcede özne asla düşmez. Türkçede ‘Geliyorum’ yeter; İngilizcede <b>I</b> şarttır.</li><li>a, an ve the gibi kelimelerin Türkçede tam karşılığı yoktur.</li><li>Deyimler ve kalıplar kelime kelime çevrilmez.</li></ul><p>Her derste önce aynayı gösterecek, uymayan noktaları da ayrıca söyleyeceğim.</p>`)];}
+function dersler(){setBar("Dilbilgisi dersleri","guide");const u=me(),g=u.gl||{},lv=[...new Set(GL.map(x=>x.lv))];
+  return `<section class="hero" style="padding-bottom:4px"><div class="eyebrow">Ayna tekniğiyle</div><h1>Adım adım <span class="mark">dilbilgisi</span></h1><p class="lead">Her ders aynı sırayı izler: ne işe yarar, Türkçedeki karşılığı, ayna, formül, örnekler, sık hatalar ve alıştırma. Bir ders 6–8 dakika sürer.</p></section>
+  <div class="plan"><button class="planitem ${g.ayna?"done":""}" data-act="lesson" data-v="ayna"><span class="pdot">${g.ayna?"✓":"0"}</span><span class="pic">🪞</span><span class="ptx"><b>Ayna tekniği</b><small>Önce bunu oku: Türkçeden İngilizceye geçişin 3 kuralı</small></span><span class="pmin">4 dk</span></button></div>
+  ${lv.map(l=>`<h2>${l} dersleri</h2><div class="plan">${GL.filter(x=>x.lv===l).map((x,i)=>`<button class="planitem ${g[x.id]?"done":""}" data-act="lesson" data-v="${x.id}"><span class="pdot">${g[x.id]?"✓":i+1}</span><span class="ptx"><b>${esc(x.t)}</b><small>${esc(x.tr)}</small></span><span class="pgo">›</span></button>`).join("")}</div>`).join("")}
+  <p class="note">B1, B2 ve C1 konularının adım adım dersleri sırayla ekleniyor. O konular şimdilik duraklardaki kısa kartlarla çalışılıyor.</p>`;}
+
 /* ===================== SESSION ENGINE ===================== */
 let SES=null;
 function startSession(title,cards,back,onDone){if(!cards.length){toast("Bu adımda şu an yapılacak bir şey yok.");return;}
   SES={title,cards,i:0,xp:0,res:[],back:back||"today",onDone,c:{},done:false};if(location.hash==="#play")route();else location.hash="#play";}
 function runStep(S,u,step,back,after){const L=LS(S.id),nm=S.code+" Ünite "+u.n;const fin=f=>()=>{f&&f();after&&after();};
   if(step==="words")return startSession(nm+": Kelimeler",wordCards(S,u),back,fin());
-  if(step==="gram")return startSession(nm+": Dilbilgisi",gramCards(S,u),back,fin(()=>{u.gram.forEach((g,i)=>L.gram[u.n+"-"+i]=1);logAct("🧠",nm+" dilbilgisi");}));
+  if(step==="gram"){let gi=u.gram.findIndex((g,i)=>!L.gram[u.n+"-"+i]);if(gi<0)gi=0;const g=u.gram[gi],T=libOf(S,u,gi);
+    const cards=T?lessonCards(T,g.e):[{k:"info",h:g.t,html:`<p>${gl(g.e)}</p><div class="formula">${esc(g.f)}</div><ul class="exs">${g.ex.map(x=>`<li>${sayBtn(x)}<span>${esc(x)}</span></li>`).join("")}</ul>`}].concat(g.ex.filter(x=>cleanS(x)&&nw(x)>=3&&nw(x)<=10).slice(0,3).map(x=>({k:"order",s:x})));
+    startSession(nm+": "+g.t,cards,back,fin(()=>{u.gram.forEach((x,i)=>{if(i===gi||(T&&libOf(S,u,i)===T))L.gram[u.n+"-"+i]=1;});if(T)me().gl[T.id]=1;logAct("🧠",nm+": "+g.t);}));
+    if(T&&SES)SES.mz=T.mz;return;}
   if(step==="lis")return startSession(nm+": Dinleme",lisCards(S,u),back,fin(()=>{const r=SES.res.filter(x=>x.grp==="lis"),ok=r.filter(x=>x.ok).length;L.lis["lis"+u.n]=r.length?ok/r.length:1;logAct("🎧",nm+" dinleme",ok+"/"+r.length);}));
   if(step==="spk")return startSession(nm+": Konuşma",spkCards(S,u),back,fin(()=>{L.spk[u.n]=1;logAct("🎤",nm+" konuşma");}));
   if(step==="wri")return startSession(nm+": Yazma",[{k:"write",task:u.wri.task,tips:u.wri.tips,m:u.wri.m,sid:S.id,key:"u"+u.n}],back,fin(()=>logAct("✍️",nm+" yazma")));
@@ -1834,16 +2156,19 @@ function runPractice(id,back,after){const S=stg(me().level);
 function runPlan(id){const u=me(),S=stg(u.level),cu=curUnit(S);
   const mk=()=>{if(!u.today||u.today.d!==dkey())u.today={d:dkey(),done:{}};u.today.done[id]=1;};
   const map={new:"words",gram:"gram",lis:"lis",spk:"spk",quiz:"quiz",wri:"wri"};
+  if(id==="ayna")return startSession("Ayna tekniği",aynaCards(),"today",()=>{u.gl.ayna=1;});
   if(map[id]&&cu)return runStep(S,cu,map[id],"today",mk);return runPractice(id,"today",mk);}
 function cardHTML(c){const st=SES.c;
   switch(c.k){
-  case "info":return `<div class="clbl">Konu</div><h2>${esc(c.h)}</h2>${c.html}`;
+  case "info":return `<div class="clbl">${esc(c.lbl||"Konu")}</div><h2>${esc(c.h)}</h2>${c.html}`;
   case "new":return `<div class="clbl">Yeni kelime</div><div class="bigw">${esc(c.w.en)} ${sayBtn(c.w.en)}</div><div class="trw">${esc(c.w.tr)}</div>${c.w.ex?`<p class="exw">${sayBtn(c.w.ex)} ${esc(c.w.ex)}</p>`:""}`;
-  case "mc":return `<div class="clbl">Doğru seçeneği bul</div><h2>${fmt(c.q)}${c.say?" "+sayBtn(c.say):""}</h2><div class="sopts">${c.opts.map((o,i)=>`<button class="sopt ${st.ans!=null?(o===c.a?"ok":i===st.ans?"bad":""):""}" data-act="sesopt" data-v="${i}" ${st.ans!=null?"disabled":""}>${esc(o)}</button>`).join("")}</div>`;
+  case "mc":return `<div class="clbl">Doğru seçeneği bul</div><h2>${fmt(c.q)}${c.say?" "+sayBtn(c.say):""}</h2><div class="sopts">${c.opts.map((o,i)=>`<button class="sopt ${st.ans!=null?(o===c.a?"ok":i===st.ans?"bad":""):""}" data-act="sesopt" data-v="${i}" ${st.ans!=null?"disabled":""}>${esc(o)}</button>`).join("")}</div>${st.ans!=null&&c.why?`<div class="why ${c.opts[st.ans]===c.a?"ok":"bad"}"><b>${c.opts[st.ans]===c.a?"Doğru.":"Doğrusu: "+esc(c.a)}</b> ${gl(c.why)}</div>`:""}`;
+  case "fill":{const full=c.s.replace("___",c.a[0]).replace(/\s*\([^)]*\)/g,"");const res=st.checked?`<div class="mres ${st.ok?"ok":"bad"}">${st.ok?"✓ Doğru!":"✗ Doğrusu:"} <b>${esc(full)}</b> ${sayBtn(full)}</div>`:"";
+    return `<div class="clbl">Boşluğu doldur</div><h2>${fmt(c.s)}</h2><p class="m">Türkçesi: ${esc(c.tr)}</p><input class="inp dictin" id="fillin" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Eksik kelimeyi yaz" value="${esc(st.val||"")}" ${st.checked?"disabled":""}>${res}`;}
   case "rev":return `<div class="clbl">Hatırlıyor musun?</div><div class="bigw">${esc(c.w.en)} ${sayBtn(c.w.en)}</div>${st.shown?`<div class="trw">${esc(c.w.tr)}</div>${c.w.ex?`<p class="exw">${esc(c.w.ex)}</p>`:""}`:`<p class="m">Önce anlamını aklından söyle, sonra kontrol et.</p>`}`;
   case "order":{if(!st.pool){st.pool=shuffle(c.s.split(/\s+/).map((w,i)=>({w,i})));st.ans=[];}
     const res=st.checked?`<div class="mres ${st.ok?"ok":"bad"}">${st.ok?"✓ Doğru!":"✗ Doğrusu: <b>"+esc(c.s)+"</b>"} ${sayBtn(c.s)}</div>`:"";
-    return `<div class="clbl">Kelimeleri doğru sıraya diz</div><div class="oline">${st.ans.map(id=>`<button class="ochip" data-act="sesunpick" data-v="${id}" ${st.checked?"disabled":""}>${esc(st.pool.find(p=>p.i===id).w)}</button>`).join("")||'<span class="m">Aşağıdan kelime seç</span>'}</div><div class="opool">${st.pool.map(p=>`<button class="ochip" data-act="sespick" data-v="${p.i}" ${st.ans.includes(p.i)||st.checked?"disabled":""}>${esc(p.w)}</button>`).join("")}</div>${res}`;}
+    return `<div class="clbl">Kelimeleri doğru sıraya diz</div>${c.tr?`<p class="trhint">${esc(c.tr)}</p>`:""}<div class="oline">${st.ans.map(id=>`<button class="ochip" data-act="sesunpick" data-v="${id}" ${st.checked?"disabled":""}>${esc(st.pool.find(p=>p.i===id).w)}</button>`).join("")||'<span class="m">Aşağıdan kelime seç</span>'}</div><div class="opool">${st.pool.map(p=>`<button class="ochip" data-act="sespick" data-v="${p.i}" ${st.ans.includes(p.i)||st.checked?"disabled":""}>${esc(p.w)}</button>`).join("")}</div>${res}`;}
   case "dict":{const res=st.checked?`<div class="mres ${st.ok?"ok":"bad"}">${st.ok?"✓ Doğru!":"✗ Doğrusu:"} <b>${esc(c.s)}</b></div>`:"";
     return `<div class="clbl">Duyduğunu yaz</div><div class="btnrow"><button class="btn pri" data-act="say" data-t="${esc(c.s)}">▶ Dinle</button><button class="btn" data-act="sesslow" data-t="${esc(c.s)}">🐢 Yavaş</button></div><input class="inp dictin" id="dictin" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Cümleyi buraya yaz" value="${esc(st.val||"")}" ${st.checked?"disabled":""}>${res}`;}
   case "shadow":{let res="";if(st.heard!=null){const tw=norm(c.s).split(" "),hw=norm(st.heard).split(" ");res=`<div class="mres ${st.score>=70?"ok":"bad"}">%${st.score} eşleşme. ${st.score>=70?"Harika!":"Bir daha dene ya da devam et."}<div class="heard">${tw.map(w=>`<span class="${hw.includes(w)?"hw":"mw"}">${esc(w)}</span>`).join(" ")}</div><small>Duyulan: ${esc(st.heard)}</small></div>`;}
@@ -1860,14 +2185,14 @@ function footHTML(c){const st=SES.c,nx=(t,dis)=>`<button class="btn pri big" dat
   case "mc":return nx("Devam",st.ans==null);
   case "rev":return st.shown?`<button class="btn big g1" data-act="sesgrade" data-v="0">Bilmedim</button><button class="btn big g2" data-act="sesgrade" data-v="1">Zorlandım</button><button class="btn big pri" data-act="sesgrade" data-v="2">Bildim</button>`:`<button class="btn pri big" data-act="sesshow">Cevabı göster</button>`;
   case "order":return st.checked?nx("Devam"):`<button class="btn pri big" data-act="sescheck" ${st.ans&&st.ans.length===st.pool.length?"":"disabled"}>Kontrol et</button>`;
-  case "dict":return st.checked?nx("Devam"):`<button class="btn pri big" data-act="sescheck">Kontrol et</button>`;
+  case "dict":case "fill":return st.checked?nx("Devam"):`<button class="btn pri big" data-act="sescheck">Kontrol et</button>`;
   case "shadow":return nx("Devam",!st.tried);
   case "talk":return nx("Konuştum, devam");
   case "write":return nx("Bitirdim");
   default:return nx("Devam");}}
 function play(){if(!SES){location.hash="#today";return "";}
   if(SES.done){const r=SES.res,ok=r.filter(x=>x.ok).length,u=me(),xp=u.days[dkey()]||0;
-    return `<div class="ses"><div class="sesdone"><div class="sdic">🎉</div><h1>Tur tamam!</h1><p class="lead">${esc(SES.title)}</p><div class="kpis"><div class="kpi hot"><b>+${SES.xp} XP</b><span>bu turda</span></div>${r.length?`<div class="kpi"><b>${ok}/${r.length}</b><span>doğru cevap</span></div>`:""}<div class="kpi"><b>${xp}/${u.goalXp}</b><span>bugünkü hedef</span></div><div class="kpi"><b>🔥 ${streak()}</b><span>günlük seri</span></div></div><div class="btnrow" style="justify-content:center;margin-top:22px"><a class="btn pri big" href="#${SES.back}" data-act="sesclose">Tamam</a></div></div></div>`;}
+    return `<div class="ses"><div class="sesdone"><div class="sdic">🎉</div><h1>Tur tamam!</h1><p class="lead">${esc(SES.title)}</p><div class="kpis"><div class="kpi hot"><b>+${SES.xp} XP</b><span>bu turda</span></div>${r.length?`<div class="kpi"><b>${ok}/${r.length}</b><span>doğru cevap</span></div>`:""}<div class="kpi"><b>${xp}/${u.goalXp}</b><span>bugünkü hedef</span></div><div class="kpi"><b>🔥 ${streak()}</b><span>günlük seri</span></div></div><div class="btnrow" style="justify-content:center;margin-top:22px"><a class="btn pri big" href="#${SES.back}" data-act="sesclose">Tamam</a>${SES.mz?`<a class="btn big" href="#cumle" data-act="mzgo" data-v="${SES.mz}">🧩 Bu yapıyla cümle kur</a>`:""}</div></div></div>`;}
   const c=SES.cards[SES.i],pct=Math.round(SES.i/SES.cards.length*100);
   return `<div class="ses"><div class="sestop"><a class="sx" href="#${SES.back}" data-act="sesclose" aria-label="Kapat">✕</a><div class="sesbar" aria-label="İlerleme %${pct}"><i style="width:${pct}%"></i></div><span class="sesxp">+${SES.xp} XP</span></div><div class="sesttl">${esc(SES.title)}, ${SES.i+1}/${SES.cards.length}</div><div class="sescard">${cardHTML(c)}</div><div class="sesfoot">${footHTML(c)}</div></div>`;}
 function rses(auto){$("#app").innerHTML=play();if(auto&&SES&&!SES.done){const c=SES.cards[SES.i];if(c.k==="new")speak(c.w.en);else if(c.k==="dict"||c.k==="shadow")speak(c.s);else if(c.k==="mc"&&c.say)speak(c.say);}}
@@ -1876,6 +2201,7 @@ function sesAdvance(){const c=SES.cards[SES.i],st=SES.c;let g=0;
   else if(c.k==="mc"){const ok=c.opts[st.ans]===c.a;SES.res.push({grp:c.grp||"w",ok});g=ok?2:0;}
   else if(c.k==="order"){SES.res.push({grp:"o",ok:st.ok});g=st.ok?4:1;}
   else if(c.k==="dict"){SES.res.push({grp:"d",ok:st.ok});g=st.ok?5:2;}
+  else if(c.k==="fill"){SES.res.push({grp:"g",ok:st.ok});g=st.ok?4:1;}
   else if(c.k==="shadow")g=5;else if(c.k==="talk")g=8;else if(c.k==="info"||c.k==="audio"||c.k==="read")g=2;
   else if(c.k==="write")g=wc(LS(c.sid).text[c.key])>=30?20:0;
   SES.xp+=g;addXp(g);SES.i++;SES.c={};stopSpeak();clearInterval(timerId);
@@ -1883,7 +2209,7 @@ function sesAdvance(){const c=SES.cards[SES.i],st=SES.c;let g=0;
 
 /* ===================== SHELL ===================== */
 const NAV=[["today","Bugün",'<circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/>'],["path","Yol",'<circle cx="6" cy="5" r="2.4"/><circle cx="18" cy="19" r="2.4"/><path d="M6 7.4V12a4 4 0 0 0 4 4h4a4 4 0 0 1 4 .6"/>'],["practice","Pratik",'<path d="M13 2.5 5 13.5h6l-1 8 8-11h-6z"/>'],["guide","Rehber",'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20"/>'],["profile","Ben",'<circle cx="12" cy="8" r="4"/><path d="M4 21c1.2-4 4.3-6 8-6s6.800 2 8 6"/>']];
-function navTab(h){if(/^(unit|exam)-/.test(h)||h==="path")return "path";if(h==="practice")return "practice";if(["guide","zamanlar","cumle"].includes(h))return "guide";if(h==="profile"||h==="level")return "profile";return "today";}
+function navTab(h){if(/^(unit|exam)-/.test(h)||h==="path")return "path";if(h==="practice")return "practice";if(["guide","zamanlar","cumle","dersler"].includes(h))return "guide";if(h==="profile"||h==="level")return "profile";return "today";}
 function setBar(title,back){const u=DB.current&&me(),on=u&&store;
   const stat=on?`<a class="hstat" href="#profile" title="Günlük seri">🔥 ${streak()}</a><a class="hstat" href="#today" title="Bugünkü XP">⚡ ${u.days[dkey()]||0}/${u.goalXp}</a>`:"";
   $("#bar").innerHTML=(title==null?`<a class="brand" href="#today"><span class="bdot"></span>Next Stop</a>`:(back?`<a class="back" href="#${back==="home"?"today":back}">‹</a>`:"")+`<span class="ttl">${esc(title)}</span>`)+`<span class="sp"></span>`+stat;
@@ -1918,10 +2244,11 @@ function placement(){const cards=[];STAGES.forEach((S,i)=>S.exams["final-a"].sec
   startSession("Seviye testi",cards,"level",()=>{let rec=STAGES.length-1;for(let i=0;i<STAGES.length;i++){if(SES.res.filter(x=>x.grp==="p"+i&&x.ok).length<2){rec=i;break;}}pickBook=STAGES[rec].id;toast("Önerilen başlangıç: "+STAGES[rec].code+" "+STAGES[rec].name);});}
 
 function plan(){const u=me(),S=stg(u.level),cu=curUnit(S),it=[],dn=dueWords().length;
+  if(!u.gl.ayna)it.push({id:"ayna",ic:"🪞",t:"Ayna tekniği",d:"Önce bunu öğren: Türkçeden İngilizceye geçişin 3 kuralı",min:4});
   if(dn||planDone("rev"))it.push({id:"rev",ic:"🔁",t:"Kelime tekrarı",d:dn?dn+" kelimenin tekrar zamanı geldi":"Bugünkü tekrar tamam",min:Math.max(1,Math.ceil(Math.min(dn,20)/5))});
   if(cu){const s=stepState(S,cu),nm="Ünite "+cu.n+" "+cu.t;
     if(s.words<1||planDone("new"))it.push({id:"new",ic:"✨",t:"Yeni kelimeler",d:nm+": "+(s.wt-s.wn?Math.min(6,s.wt-s.wn)+" yeni kelime":"kelimeler tamam"),min:4});
-    if(s.gram<1||planDone("gram"))it.push({id:"gram",ic:"🧠",t:"Dilbilgisi",d:nm+": "+cu.gram[0].t,min:5});
+    if(s.gram<1||planDone("gram"))it.push({id:"gram",ic:"🧠",t:"Dilbilgisi dersi",d:nm+": "+cu.gram[Math.max(0,cu.gram.findIndex((g,i)=>!LS(S.id).gram[cu.n+"-"+i]))].t,min:7});
     it.push(s.lis<1||planDone("lis")?{id:"lis",ic:"🎧",t:"Dinleme",d:nm+": "+cu.lis.t,min:5}:{id:"dict",ic:"🎧",t:"Dikte",d:"Duyduğunu yaz: 5 cümle",min:4});
     it.push(s.spk<1||planDone("spk")?{id:"spk",ic:"🎤",t:"Konuşma",d:nm+": kalıpları sesli tekrar et",min:5}:{id:"shadow",ic:"🎤",t:"Gölgeleme",d:"5 cümleyi dinle ve tekrar et",min:3});
     if(s.words>=1&&s.gram>=1){if(!s.quiz||planDone("quiz"))it.push({id:"quiz",ic:"✅",t:"Ünite testi",d:nm+": 6 soru",min:3});else if(!s.wri||planDone("wri"))it.push({id:"wri",ic:"✍️",t:"Yazma",d:nm+": kısa yazma görevi",min:8});}
@@ -1964,9 +2291,10 @@ function practice(){setBar("Pratik",null);const S=stg(me().level),L=LS(S.id),dn=
 
 function guide(){setBar("Rehber",null);const u=me(),custom=[];STAGES.forEach(S=>S.units.forEach(un=>allWords(S,un).filter(w=>w.mine).forEach(w=>custom.push(w))));
   return `<section class="hero" style="padding-bottom:4px"><div class="eyebrow">Araçlar ve başvuru</div><h1>Takıldığında <span class="mark">buraya</span> bak</h1></section>
-  <div class="pgrid"><a class="pcard" href="#cumle"><span class="pic">🧩</span><b>Cümle makinesi</b><span class="tag">8 formül</span><small>Sütunlardan parça seç, doğru cümleyi ve Türkçesini gör.</small></a>
+  <div class="pgrid"><a class="pcard" href="#dersler"><span class="pic">🪞</span><b>Dilbilgisi dersleri</b><span class="tag">${Object.keys(u.gl).length}/${GL.length+1} tamamlandı</span><small>Ayna tekniğiyle adım adım: Türkçesi, formül, örnekler, sık hatalar, alıştırma.</small></a><a class="pcard" href="#cumle"><span class="pic">🧩</span><b>Cümle makinesi</b><span class="tag">8 formül</span><small>Sütunlardan parça seç, doğru cümleyi ve Türkçesini gör.</small></a>
   <a class="pcard" href="#zamanlar"><span class="pic">📖</span><b>Zamanlar ve formüller</b><span class="tag">12 zaman</span><small>Formüller, zaman çizelgeleri, sık hatalar, düzensiz fiiller, zaman testi.</small></a></div>
-  <div class="panel"><h3>Next Stop nasıl çalışır?</h3><ol class="tips"><li><b>Bugün</b> sekmesi sana her gün kısa bir rota çizer: tekrar, yeni kelime, dilbilgisi, dinleme, konuşma.</li><li>Kelimeler <b>aralıklı tekrar</b> ile sorulur: bildikçe 1, 3, 7, 14, 30 ve 60 gün sonra yeniden gelir. Bilemezsen başa döner.</li><li><b>Dikte</b> ve <b>gölgeleme</b> kulağını ve ağzını çalıştırır: anlamak ve konuşmak için en hızlı iki alıştırma.</li><li>Her durakta 6 adım var. Hepsini bitirince durak tamamlanır, hat ilerler.</li><li>Günlük hedefini doldurmak serini uzatır. Az ama her gün, çok ama arada bir çalışmaktan iyidir.</li></ol></div>
+  <div class="panel"><h3>Next Stop nasıl çalışır?</h3><ol class="tips"><li><b>Bugün</b> sekmesi sana her gün kısa bir rota çizer: tekrar, yeni kelime, dilbilgisi, dinleme, konuşma.</li><li>Dilbilgisi <b>Ayna tekniği</b> ile anlatılır: Türkçe cümleyi sondan başa çözersin, İngilizcesi ortaya çıkar.</li><li>Kelimeler <b>aralıklı tekrar</b> ile sorulur: bildikçe 1, 3, 7, 14, 30 ve 60 gün sonra yeniden gelir. Bilemezsen başa döner.</li><li><b>Dikte</b> ve <b>gölgeleme</b> kulağını ve ağzını çalıştırır: anlamak ve konuşmak için en hızlı iki alıştırma.</li><li>Her durakta 6 adım var. Hepsini bitirince durak tamamlanır, hat ilerler.</li><li>Günlük hedefini doldurmak serini uzatır. Az ama her gün, çok ama arada bir çalışmaktan iyidir.</li></ol></div>
+  <div class="panel"><h3>Terimler sözlüğü</h3>${Object.entries(GLOS).map(([k,v])=>`<div class="act"><span><b>${esc(k.replace(/^v/,"V"))}</b><br><span class="m">${esc(v)}</span></span></div>`).join("")}</div>
   <div class="panel"><h3>Defterim (${u.fav.length})</h3>${u.fav.length?u.fav.slice(0,30).map(x=>`<div class="act"><span>${sayBtn(x.en)}</span><span><b>${esc(x.en)}</b><br><span class="m">${esc(x.tr)}</span></span></div>`).join(""):`<p class="m">Cümle makinesinde ★ ile kaydettiğin cümleler burada görünür.</p>`}</div>
   <div class="panel"><h3>Eklediğim kelimeler (${custom.length})</h3>${custom.length?custom.map(w=>`<div class="act"><span>${sayBtn(w.en)}</span><span><b>${esc(w.en)}</b><br><span class="m">${esc(w.tr)}</span></span></div>`).join(""):`<p class="m">Her durağın kelime listesinin altından kendi kelimelerini ekleyebilirsin; tekrar sistemine girer.</p>`}</div>`;}
 
@@ -2009,7 +2337,7 @@ function route(){stopSpeak();clearInterval(timerId);clearInterval(examTimer);
   lastRoute=CUR=h;document.body.classList.toggle("insession",h==="play");
   if(h==="login")html=login();else if(h==="level")html=levelPage();else if(h==="play")html=play();
   else if(h==="path")html=pathView();else if(h==="practice")html=practice();else if(h==="guide")html=guide();else if(h==="profile")html=profile();
-  else if(h==="zamanlar")html=zamanlar();else if(h==="cumle")html=cumle();
+  else if(h==="zamanlar")html=zamanlar();else if(h==="cumle")html=cumle();else if(h==="dersler")html=dersler();
   else if((m=h.match(/^unit-([a-z0-9]+)-(\d{1,2})$/))&&stg(m[1])&&stg(m[1]).units[+m[2]-1])html=unitView(stg(m[1]),stg(m[1]).units[+m[2]-1]);
   else if((m=h.match(/^unit-(\d{1,2})$/))&&stg(me().level).units[+m[1]-1])html=unitView(stg(me().level),stg(me().level).units[+m[1]-1]);
   else if((m=h.match(/^exam-([a-z0-9]+)-([a-z-]+)$/))&&stg(m[1])&&stg(m[1]).exams[m[2]])html=examView(stg(m[1]),m[2]);
@@ -2040,6 +2368,9 @@ document.addEventListener("click",e=>{
   else if(a==="setstage"){const u=me();u.level=v;bind();save();toast(stg(v).code+" "+stg(v).name+" hattına geçtin.");route();}
   /* main */
   else if(a==="plan")runPlan(v);
+  else if(a==="lesson"){const u=me();if(v==="ayna")startSession("Ayna tekniği",aynaCards(),"dersler",()=>{u.gl.ayna=1;});else{const T=GLI[v];startSession(T.t,lessonCards(T),"dersler",()=>{u.gl[v]=1;logAct("🧠","Dilbilgisi dersi: "+T.t);});if(SES)SES.mz=T.mz;}}
+  else if(a==="gl"){document.querySelectorAll(".glpop").forEach(x=>x.remove());const d=document.createElement("button");d.className="glpop";d.innerHTML="<b>"+esc(b.textContent)+"</b><br>"+esc(GLOS[v]||"");d.onclick=()=>d.remove();document.body.appendChild(d);setTimeout(()=>d.remove(),7000);}
+  else if(a==="mzgo"){MZ.f=v;MZ.ty="+";MZ.mode="free";mzFix(MZ);SES=null;}
   else if(a==="prac")runPractice(v,"practice");
   else if(a==="step"){const S=stg(b.dataset.s);runStep(S,S.units[+b.dataset.n-1],v,"unit-"+S.id+"-"+b.dataset.n);}
   else if(a==="lineopen"){pathOpen=pathOpen===v&&CUR==="path"?"-":v;if(CUR==="path")route();}
@@ -2055,8 +2386,9 @@ document.addEventListener("click",e=>{
   else if(a==="sesunpick"){SES.c.ans=SES.c.ans.filter(x=>x!==+v);rses();}
   else if(a==="sescheck"){const c=SES.cards[SES.i],st=SES.c;
     if(c.k==="order")st.ok=st.ans.map(id=>st.pool.find(p=>p.i===id).w).join(" ")===c.s;
+    else if(c.k==="fill"){st.val=$("#fillin").value;st.ok=c.a.some(x=>norm(x)===norm(st.val));}
     else{st.val=$("#dictin").value;st.ok=norm(st.val)===norm(c.s);}
-    st.checked=true;rses();if(c.k==="order"||!st.ok)speak(c.s);}
+    st.checked=true;rses();if(c.k==="fill")speak(c.s.replace("___",c.a[0]).replace(/\s*\([^)]*\)/g,""));else if(c.k==="order"||!st.ok)speak(c.s);}
   else if(a==="sesslow")speak(b.dataset.t,false,0.6);
   else if(a==="sesplay"){const c=SES.cards[SES.i];speak(c.text,isDlg(c.text));}
   else if(a==="sesself"){SES.c.tried=true;rses();}
@@ -2109,10 +2441,10 @@ document.addEventListener("click",e=>{
   else if(a==="mzans"){MZ.checked=true;MZ.ans=true;rmz();}
   else if(a==="mznew"){mzNew();rmz();}
 });
-document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="dictin"){e.preventDefault();const b=document.querySelector('[data-act="sescheck"]');if(b)b.click();}});
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.target.id==="dictin"||e.target.id==="fillin")){e.preventDefault();const b=document.querySelector('[data-act="sescheck"]');if(b)b.click();}});
 document.addEventListener("input",e=>{const t=e.target;
   if(t.id==="irrq"){const q=t.value.trim().toLocaleLowerCase("tr");document.querySelectorAll(".irr tbody tr").forEach(r=>r.hidden=q&&!r.dataset.s.includes(q));return;}
-  if(t.id==="dictin"&&SES){SES.c.val=t.value;return;}
+  if((t.id==="dictin"||t.id==="fillin")&&SES){SES.c.val=t.value;return;}
   if(t.tagName==="TEXTAREA"&&t.dataset.k&&store){const k=t.dataset.k;LS(t.dataset.sid||me().level).text[k]=t.value;save();const w=document.getElementById("wc-"+k);if(w)w.textContent=wc(t.value)+" kelime, otomatik kaydedilir";}});
 route();
 

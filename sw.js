@@ -1,5 +1,5 @@
 // Güncelleme yaptığında bu sürüm adını değiştir (v1 → v2), telefonlar yeni dosyaları indirsin.
-const CACHE = "next-stop-v6";
+const CACHE = "next-stop-v7";
 const ASSETS = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
